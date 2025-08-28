@@ -1,0 +1,37 @@
+import requests
+import os
+
+ORS_API_KEY = os.getenv("ORS_API_KEY")
+
+def get_eta(ambulances, incident):
+    url = "https://api.openrouteservice.org/v2/matrix/driving-car"
+    headers = {
+        "Authorization": ORS_API_KEY,
+        "Content-Type": "application/json"
+    }
+
+    # Here we append all the ambulances locations to minimise the requests we make to the API
+    # and add the incident at the end
+    locations = [ [amb.location.lon, amb.location.lat] for amb in ambulances ]
+    locations.append([incident.location.lon, incident.location.lat])
+
+    body = {
+        "locations": locations,
+        "metrics": ["duration", "distance"]
+    }
+
+    response = requests.post(url, json=body, headers=headers)
+    data = response.json()
+
+    incident_index = len(locations) - 1
+    best_eta = float("inf")
+    best_ambulance = None
+
+    # We go through all the ETA's to see which one's the closest ( in minutes )
+    for i, amb in enumerate(ambulances):
+        eta = data["durations"][i][incident_index] / 60
+        if eta < best_eta and amb.status == "Available":
+            best_eta = eta
+            best_ambulance = amb
+
+    return best_ambulance, round(best_eta, 1)
