@@ -1,6 +1,8 @@
 import requests
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 ORS_API_KEY = os.getenv("ORS_API_KEY")
 
 def get_eta(ambulances, incident):
@@ -21,6 +23,15 @@ def get_eta(ambulances, incident):
     }
 
     response = requests.post(url, json=body, headers=headers)
+    if response.status_code != 200:
+        print("ORS Error:", response.status_code, response.text)
+        return None, None
+
+    data = response.json()
+    if "durations" not in data:
+        print("No durations in response:", data)
+        return None, None
+
     data = response.json()
 
     incident_index = len(locations) - 1

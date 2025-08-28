@@ -2,6 +2,7 @@ import logging
 from fastapi import FastAPI
 from Incident import *
 from Ambulance import *
+from ORS import *
 import math
 
 logging.basicConfig(
@@ -51,32 +52,26 @@ async def dispatch(incident_id: int):
     incident = active_incidents[incident_id]
 
     # Find the nearest ambulance available
-    min_distance = 999
-    closest_ambulance = None
-    for amb_id, amb in ambulances.items():
-      if amb.status == "Available":
-          dist = haversine(incident.location, amb.location)
-          if dist < min_distance:
-              min_distance = dist
-              closest_ambulance = amb
+    ambs = list(ambulances.values())
+    best_amb, eta = get_eta(ambs, incident)
 
     # Assign that ambulance to the incident
 
-    if closest_ambulance:
-      closest_ambulance.status = "Busy"
-      incident.assigned_unit = closest_ambulance.id
+    if best_amb:
+      best_amb.status = "Busy"
+      incident.assigned_unit = best_amb.id
       active_incidents.pop(incident.id)
 
       logger.info(
-          f"Ambulance {closest_ambulance.id} dispatched "
-          f"to Incident {incident.id} at {min_distance} km"
+          f"Ambulance {best_amb.id} dispatched "
+          f"to Incident {incident.id} at {eta} min away"
       )
       return {
-              "msg": f"Ambulance {closest_ambulance.id} dispatched",
-              "distance_km": round(min_distance, 2),
-              "incident": incident,
-              "ambulance": closest_ambulance
-          }
+          "msg": f"Ambulance {best_amb.id} dispatched",
+          "eta_minutes": round(best_eta, 1),
+          "incident": incident.dict(),
+          "ambulance": best_amb.dict()
+      }
 
     return {"msg": "No available ambulances"}
 

@@ -1,0 +1,15 @@
+2025-08-28 18:15:18,600 - INFO - Ambulance created: id=1 status='Available' location=Location(lat=44.4268, lon=26.1025) default_location=None
+2025-08-28 18:15:31,718 - INFO - Ambulance created: id=2 status='Available' location=Location(lat=44.435, lon=26.097) default_location=None
+2025-08-28 18:16:03,969 - INFO - Incident created: id=1 severity=3 location=Location(lat=44.437, lon=26.1) assigned_unit=None
+2025-08-28 18:17:32,772 - WARNING - Dispatch failed: Incident 1 not found
+2025-08-28 18:17:40,334 - WARNING - Dispatch failed: Incident 1 not found
+2025-08-28 18:18:09,161 - INFO - Ambulance created: id=1 status='Available' location=Location(lat=44.4268, lon=26.1025) default_location=None
+2025-08-28 18:18:36,592 - INFO - Ambulance created: id=2 status='Available' location=Location(lat=44.435, lon=26.097) default_location=None
+2025-08-28 18:19:16,068 - INFO - Incident created: id=1 severity=3 location=Location(lat=44.437, lon=26.1) assigned_unit=None
+2025-08-28 18:27:49,232 - INFO - Ambulance created: id=1 status='Available' location=Location(lat=44.4268, lon=26.1025) default_location=None
+2025-08-28 18:27:56,297 - INFO - Ambulance created: id=2 status='Available' location=Location(lat=44.435, lon=26.097) default_location=None
+2025-08-28 18:28:27,145 - INFO - Incident created: id=1 severity=3 location=Location(lat=44.437, lon=26.1) assigned_unit=None
+2025-08-28 18:31:18,568 - INFO - Ambulance created: id=1 status='Available' location=Location(lat=44.4268, lon=26.1025) default_location=None
+2025-08-28 18:31:31,397 - INFO - Ambulance created: id=2 status='Available' location=Location(lat=44.435, lon=26.097) default_location=None
+2025-08-28 18:31:52,196 - INFO - Incident created: id=1 severity=3 location=Location(lat=44.437, lon=26.1) assigned_unit=None
+2025-08-28 18:32:13,236 - INFO - Ambulance 2 dispatched to Incident 1 at 3.2 min away
