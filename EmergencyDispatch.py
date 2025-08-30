@@ -3,7 +3,10 @@ from fastapi import FastAPI
 from Incident import *
 from Ambulance import *
 from ORS import *
+from GeoApify import *
 import math
+import requests
+
 
 logging.basicConfig(
     level=logging.INFO,  # DEBUG, INFO, WARNING, ERROR
@@ -68,7 +71,7 @@ async def dispatch(incident_id: int):
       )
       return {
           "msg": f"Ambulance {best_amb.id} dispatched",
-          "eta_minutes": round(best_eta, 1),
+          "eta_minutes": round(eta, 1),
           "incident": incident.dict(),
           "ambulance": best_amb.dict()
       }
@@ -79,6 +82,12 @@ async def dispatch(incident_id: int):
 
     # TODO: We need to treat corner cases when one ambulance is available and there are 2 incidents,
     #  one more severe but further
+
+@app.post("/convert_address")
+async def convert_address(address: str):
+    lat, lon = convert_address_to_coordinates(address)
+    return {"lat": lat, "lon": lon}
+
 
 
 def haversine(incident_location: Location, ambulance_location: Location): # Mathematics formula to calculate the real distance between two coordinates
