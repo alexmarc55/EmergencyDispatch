@@ -1,11 +1,15 @@
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from Incident import *
 from Ambulance import *
 from ORS import *
 from GeoApify import *
 import math
-import requests
+import models
+from models import *
+from database import engine, SessionLocal
+from sqlalchemy.orm import Session
+
 
 
 logging.basicConfig(
@@ -20,15 +24,31 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
-
+models.Base.metadata.create_all(bind = engine) # Creates the database when starting the app
 all_incidents = {}
 active_incidents = {}
 ambulances = {}
 
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 @app.post("/create_incident", response_model= Incident)
-async def create_incident(incident: Incident):
+async def create_incident(incident: Incident, db: Session = Depends(get_db)):
   all_incidents[incident.id] = incident
   active_incidents[incident.id] = incident
+  db_incident = IncidentDB(
+      severity = incident.severity,
+      lat = incident.lat,
+      lon = incident.lon
+  )
+  db.add(db_incident)
+  db.commit()
+  db.refresh(db_incident)
   logger.info(f"Incident created: {incident}")
   return incident
 
@@ -37,8 +57,17 @@ async def incidents():
     return all_incidents
 
 @app.post("/create_ambulance", response_model= Ambulance)
-async def create_ambulance(ambulance: Ambulance):
+async def create_ambulance(ambulance: Ambulance, db: Session = Depends(get_db)):
     ambulances[ambulance.id] = ambulance
+
+    db_ambulance = AmbulanceDB(
+        status = ambulance.status,
+        lat = ambulance.lat,
+        lon = ambulance.lon
+    )
+    db.add(db_ambulance)
+    db.commit()
+    db.refresh(db_ambulance)
     logger.info(f"Ambulance created: {ambulance}")
     return ambulance
 
@@ -87,22 +116,3 @@ async def dispatch(incident_id: int):
 async def convert_address(address: str):
     lat, lon = convert_address_to_coordinates(address)
     return {"lat": lat, "lon": lon}
-
-
-
-def haversine(incident_location: Location, ambulance_location: Location): # Mathematics formula to calculate the real distance between two coordinates
-    R = 6371.0  # Earth's radius
-
-    lat1_rad = math.radians(incident_location.lat)
-    lon1_rad = math.radians(incident_location.lon)
-    lat2_rad = math.radians(ambulance_location.lat)
-    lon2_rad = math.radians(ambulance_location.lon)
-
-    dlat = lat2_rad - lat1_rad
-    dlon = lon2_rad - lon1_rad
-
-    a = math.sin(dlat / 2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-    distance = R * c
-    return distance

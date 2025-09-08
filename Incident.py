@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 from typing import Optional
-from Location import *
+
 class Incident(BaseModel):
     id: Optional[int]
     severity: int
-    location: Location
+    lat: float
+    lon: float
     assigned_unit: Optional[int] = None

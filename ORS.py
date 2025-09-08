@@ -14,8 +14,8 @@ def get_eta(ambulances, incident):
 
     # Here we append all the ambulances locations to minimise the requests we make to the API
     # and add the incident at the end
-    locations = [ [amb.location.lon, amb.location.lat] for amb in ambulances ]
-    locations.append([incident.location.lon, incident.location.lat])
+    locations = [ [amb.lon, amb.location.lat] for amb in ambulances ]
+    locations.append([incident.lon, incident.lat])
 
     body = {
         "locations": locations,
