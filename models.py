@@ -13,6 +13,7 @@ class AmbulanceDB(Base):
 class IncidentDB(Base):
     __tablename__ = 'incidents'
     id = Column(Integer, primary_key= True, index = True)
+    status = Column(String)
     severity = Column(Integer)
     lat = Column(Float)
     lon = Column(Float)

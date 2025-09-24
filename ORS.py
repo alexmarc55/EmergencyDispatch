@@ -14,7 +14,7 @@ def get_eta(ambulances, incident):
 
     # Here we append all the ambulances locations to minimise the requests we make to the API
     # and add the incident at the end
-    locations = [ [amb.lon, amb.location.lat] for amb in ambulances ]
+    locations = [ [amb.lon, amb.lat] for amb in ambulances ]
     locations.append([incident.lon, incident.lat])
 
     body = {
@@ -40,8 +40,11 @@ def get_eta(ambulances, incident):
 
     # We go through all the ETA's to see which one's the closest ( in minutes )
     for i, amb in enumerate(ambulances):
-        eta = data["durations"][i][incident_index] / 60
-        if eta < best_eta and amb.status == "Available":
+        duration = data["durations"][i][incident_index]
+        if duration is None:
+            continue
+        eta = duration / 60
+        if eta < best_eta:
             best_eta = eta
             best_ambulance = amb
 
