@@ -1,5 +1,6 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, DateTime
+from datetime import datetime
 class AmbulanceDB(Base):
     __tablename__ = 'ambulances'
 
@@ -9,6 +10,7 @@ class AmbulanceDB(Base):
     lon = Column(Float)
     default_lat = Column(Float, default = None)
     default_lon = Column(Float, default = None)
+    available_at = Column(DateTime, nullable=True)
 
 class IncidentDB(Base):
     __tablename__ = 'incidents'
