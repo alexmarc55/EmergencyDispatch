@@ -26,7 +26,6 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 models.Base.metadata.create_all(bind = engine) # Creates the database when starting the app
-ambulances = {}
 
 
 def get_db():
@@ -36,19 +35,30 @@ def get_db():
     finally:
         db.close()
 
-@app.post("/create_incident", response_model= Incident)
-async def create_incident(incident: Incident, db: Session = Depends(get_db)):
-  db_incident = IncidentDB(
-      severity = incident.severity,
-      status = incident.status,
-      lat = incident.lat,
-      lon = incident.lon,
-      assigned_unit = incident.assigned_unit
-  )
-  db.add(db_incident)
-  db.commit()
-  db.refresh(db_incident)
-  created_incident = Incident(
+class Status:
+    ACTIVE = "Active"
+    RESOLVED = "Resolved"
+# Helper functions for incidents
+
+def get_incident_by_id(incident_id: int, db: Session = Depends(get_db)):
+    incident = db.query(IncidentDB).filter(IncidentDB.id == incident_id).first()
+    return incident
+
+def create_incident_in_db(incident: Incident, db: Session = Depends(get_db)):
+    db_incident = IncidentDB(
+        severity=incident.severity,
+        status=incident.status,
+        lat=incident.lat,
+        lon=incident.lon,
+        assigned_unit=incident.assigned_unit
+    )
+    db.add(db_incident)
+    db.commit()
+    db.refresh(db_incident)
+    return db_incident
+
+def convert_incident_to_response(incident: Incident, db: Session = Depends(get_db)):
+    created =  Incident(
       id = db_incident.id,
       severity = db_incident.severity,
       status = db_incident.status,
@@ -56,7 +66,73 @@ async def create_incident(incident: Incident, db: Session = Depends(get_db)):
       lon = db_incident.lon,
       assigned_unit = db_incident.assigned_unit
   )
+    return created
 
+def update_incident_in_db(db_incident: Incident, updated_incident: Incident, db: Session = Depends(get_db)):
+    db_updated_incident.severity = updated_incident.severity
+    db_updated_incident.status = updated_incident.status
+    db_updated_incident.lat = updated_incident.lat
+    db_updated_incident.lon = updated_incident.lon
+    db_updated_incident.assigned_unit = updated_incident.assigned_unit
+
+    db.commit()
+    db.refresh(db_updated_incident)
+    return db_updated_incident
+
+def delete_incident_in_db(incident_id: int, db: Session = Depends(get_db)):
+    incident = get_incident_by_id(incident_id, db)
+    if not incident:
+        return False
+    db.delete(incident)
+    db.commit()
+    return True
+
+
+
+# Helper functions for ambulances
+def get_ambulance_by_id(ambulance_id: int, db: Session = Depends(get_db)):
+    ambulance = db.query(AmbulanceDB).filter(AmbulanceDB.id == ambulance_id).first()
+    if not ambulance:
+        logger.warning(f"Ambulance with ID {ambulance_id} was not found.")
+        raise HTTPException(status_code=404, detail="Ambulance was not found")
+    return ambulance
+
+def create_ambulance_in_db(db_ambulance: Ambulance, db: Session = Depends(get_db)):
+    db_ambulance = AmbulanceDB(
+        status=ambulance.status,
+        lat=ambulance.lat,
+        lon=ambulance.lon
+    )
+    db.add(db_ambulance)
+    db.commit()
+    db.refresh(db_ambulance)
+    logger.info(f"Ambulance with ID {db_ambulance.id} was successfully added to database.")
+    return db_ambulance
+
+def convert_ambulance_to_response(ambulance: Ambulance, db: Session = Depends(get_db)):
+    ambulance = Ambulance(
+        id=db_ambulance.id,
+        status=db_ambulance.status,
+        lat=db_ambulance.lat,
+        lon=db_ambulance.lon,
+        default_lat=db_ambulance.default_lat,
+        default_lon=db_ambulance.default_lon
+    )
+    return ambulance
+
+def update_ambulance_in_db(ambulance: Ambulance, updated_ambulance: Ambulance, db: Session = Depends(get_db)):
+    ambulance.status = updated_ambulance.status
+    ambulance.lat = updated_ambulance.lat
+    ambulance.lon = updated_ambulance.lon
+
+    db.commit()
+    db.refresh(ambulance)
+
+# API'S
+@app.post("/create_incident", response_model= Incident)
+async def create_incident(incident: Incident, db: Session = Depends(get_db)):
+  db_incident = create_incident_in_db(incident, db)
+  created_incident = convert_incident_to_response(db_incident, db)
   logger.info(f"Incident created: {created_incident}")
   return created_incident
 
@@ -67,66 +143,29 @@ async def incidents(db: Session = Depends(get_db)):
 
 @app.put("/update_incident", response_model= Incident)
 async def update_incident(updated_incident: Incident, db: Session = Depends(get_db)):
-   db_updated_incident = db.query(IncidentDB).filter(IncidentDB.id == updated_incident.id).first()
-   if not db_updated_incident:
-       logger.warning(f"Incident with ID {updated_incident.id} was not found.")
-       raise HTTPException(status_code=404, detail=f"Incident not found")
+    db_incident = get_incident_by_id(updated_incident.id, db)
+    if not db_incident:
+        logger.warning(f"Incident with ID {updated_incident.id} was not found.")
+        raise HTTPException(status_code=404, detail=f"Incident not found")
+    updated = convert_incident_to_response(update_incident, db)
 
-   db_updated_incident.severity = updated_incident.severity
-   db_updated_incident.status = updated_incident.status
-   db_updated_incident.lat = updated_incident.lat
-   db_updated_incident.lon = updated_incident.lon
-   db_updated_incident.assigned_unit = updated_incident.assigned_unit
-
-   db.commit()
-   db.refresh(db_updated_incident)
-
-   updated = Incident(
-       id = db_updated_incident.id,
-       severity = db_updated_incident.severity,
-       status = db_updated_incident.status,
-       lat = db_updated_incident.lat,
-       lon = db_updated_incident.lon,
-       assigned_unit = db_updated_incident.assigned_unit
-   )
-
-   logger.info(f"Incident with ID {updated.id} was succesfully updated!")
-   return updated
+    logger.info(f"Incident with ID {updated.id} was succesfully updated!")
+    return updated
 
 @app.delete("/delete_incident")
 async def delete_incident(incident_id: int, db: Session = Depends(get_db)):
-    db_deleted_incident = db.query(IncidentDB).filter(IncidentDB.id == incident_id).first()
-    if not db_deleted_incident:
+    success = delete_incident_in_db(incident_id, db)
+    if not success:
         logger.warning(f"Incident with ID {incident_id} was not found.")
         raise HTTPException(status_code=404, detail=f"Incident not found")
 
-    db.delete(db_deleted_incident)
-    db.commit()
     logger.info(f"Incident with ID {incident_id} was succesfully deleted!")
-
+    return {"msg": "Incident was successfully deleted"}
 
 @app.post("/create_ambulance", response_model= Ambulance)
 async def create_ambulance(ambulance: Ambulance, db: Session = Depends(get_db)):
-    db_ambulance = AmbulanceDB(
-        status=ambulance.status,
-        lat=ambulance.lat,
-        lon=ambulance.lon
-    )
-    db.add(db_ambulance)
-    db.commit()
-    db.refresh(db_ambulance)
-
-    created_ambulance = Ambulance(
-        id=db_ambulance.id,
-        status=db_ambulance.status,
-        lat=db_ambulance.lat,
-        lon=db_ambulance.lon,
-        default_lat=db_ambulance.default_lat,
-        default_lon=db_ambulance.default_lon
-    )
-
-    ambulances[created_ambulance.id] = created_ambulance
-
+    db_ambulance = create_ambulance_in_db(ambulance, db)
+    created_ambulance = convert_ambulance_to_response(db_ambulance, db)
     return created_ambulance
 
 @app.get("/ambulances")
@@ -136,27 +175,13 @@ async def list_ambulances(db: Session = Depends(get_db)):
 
 @app.put("/update_ambulance")
 async def update_ambulance(updated_ambulance: Ambulance, db: Session = Depends(get_db)):
-    db_updated_ambulance = db.query(AmbulanceDB).filter(AmbulanceDB.id == updated_ambulance.id).first()
+    ambulance = get_ambulance_by_id(updated_ambulance.id, db)
     if not db_updated_ambulance:
         logger.warning(f"Incident with ID {updated_incident.id} was not found.")
         raise HTTPException(status_code=404, detail=f"Incident not found")
+    updated = update_ambulance_in_db(ambulance, updated_ambulance)
 
-    db_updated_ambulance.severity = updated_ambulance.severity
-    db_updated_ambulance.status = updated_ambulance.status
-    db_updated_ambulance.lat = updated_ambulance.lat
-    db_updated_ambulance.lon = updated_ambulance.lon
-
-    db.commit()
-    db.refresh(db_updated_ambulance)
-
-    updated = Ambulance(
-        id=db_updated_ambulance.id,
-        status=db_updated_ambulance.status,
-        lat=db_updated_ambulance.lat,
-        lon=db_updated_ambulance.lon,
-        default_lat = db_updated_ambulance.default_lat,
-        default_lon = db_updated_ambulance.default_lon
-    )
+    updated = convert_ambulance_to_response(updated_ambulance, db)
 
     logger.info(f"Incident with ID {updated.id} was succesfully updated!")
     return updated
