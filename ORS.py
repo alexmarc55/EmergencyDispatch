@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 ORS_API_KEY = os.getenv("ORS_API_KEY")
-
+sorted_etas = []
 def get_eta(ambulances, incident):
     url = "https://api.openrouteservice.org/v2/matrix/driving-car"
     headers = {
@@ -33,19 +33,22 @@ def get_eta(ambulances, incident):
         return None, None
 
     data = response.json()
+    print(data)
 
     incident_index = len(locations) - 1
     best_eta = float("inf")
     best_ambulance = None
-
+    results = []
     # We go through all the ETA's to see which one's the closest ( in minutes )
     for i, amb in enumerate(ambulances):
         duration = data["durations"][i][incident_index]
         if duration is None:
             continue
         eta = duration / 60
+        results.append((amb,round(eta,1)))
         if eta < best_eta:
             best_eta = eta
             best_ambulance = amb
-
+    results.sort(key=lambda x: x[1])
+    sorted_etas = results
     return best_ambulance, round(best_eta, 1)
