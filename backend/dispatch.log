@@ -22,3 +22,5 @@
 2025-08-28 20:55:08,470 - INFO - Incident created: id=1 severity=3 location=Location(lat=44.437, lon=26.1) assigned_unit=None
 2025-08-28 20:55:20,881 - INFO - Ambulance 2 dispatched to Incident 1 at 3.2 min away
 
+2025-10-19 12:20:11,567 - INFO - Scheduler started
+2025-10-19 12:20:17,130 - INFO - Scheduler has been shut down
