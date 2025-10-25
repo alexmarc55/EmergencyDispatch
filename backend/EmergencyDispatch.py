@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.date import DateTrigger
+from fastapi.middleware.cors import CORSMiddleware
 import atexit
 
 
@@ -36,6 +37,14 @@ scheduler.start()
 # Gracefully shut down scheduler
 atexit.register(lambda: scheduler.shutdown())
 
+# CORS configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def get_db():
     db = SessionLocal()

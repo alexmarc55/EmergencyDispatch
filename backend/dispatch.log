@@ -24,3 +24,10 @@
 
 2025-10-19 12:20:11,567 - INFO - Scheduler started
 2025-10-19 12:20:17,130 - INFO - Scheduler has been shut down
+2025-10-19 14:30:11,606 - INFO - Scheduler started
+2025-10-19 14:30:35,526 - INFO - Scheduler has been shut down
+2025-10-20 11:25:29,796 - INFO - Scheduler started
+2025-10-20 11:25:54,288 - INFO - Incident created: id=1 severity=0 status='string' lat=0.0 lon=0.0 assigned_unit=0
+2025-10-20 11:36:20,164 - INFO - Scheduler has been shut down
+2025-10-25 15:03:17,378 - INFO - Scheduler started
+2025-10-25 15:07:54,757 - INFO - Scheduler has been shut down

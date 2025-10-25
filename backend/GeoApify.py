@@ -25,5 +25,4 @@ def convert_address_to_coordinates(address: str):
         lon = results[0]["lon"]
         return lat, lon
 
-    # Dacă nu a găsit nimic
     raise ValueError(f"Address '{address}' was not found in Romania")

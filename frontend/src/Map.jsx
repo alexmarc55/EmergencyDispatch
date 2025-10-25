@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import './Map.css'
 
 // Fix default marker icons
 delete L.Icon.Default.prototype._getIconUrl
@@ -10,7 +11,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
 
-export default function Map({ sidebarOpen }) {
+export default function Map({ sidebarOpen, incidents, ambulances}) {
   const position = [47.657, 23.590] // Baia Mare, Romania
 
   return (
@@ -30,6 +31,33 @@ export default function Map({ sidebarOpen }) {
           Baia Mare, Romania <br /> Emergency Dispatch Center
         </Popup>
       </Marker>
+
+      {/* Render incident markers */}
+      {incidents.map(incident => (
+        <Marker
+          key={`incident-${incident.id}`}
+          position={[incident.lat, incident.lon]}
+        >
+          <Popup className="popup-content">
+            <strong>Incident #{incident.id}</strong><br />
+            Severity: {incident.severity}<br />
+            Status: {incident.status} <br />
+            </Popup>
+        </Marker>
+      ))}
+
+      {/* Render ambulance markers */}
+      {ambulances.map(ambulance => (
+        <Marker 
+          key={`ambulance-${ambulance.id}`} 
+          position={[ambulance.lat, ambulance.lon]}
+        >
+          <Popup>
+            <strong>Ambulance #{ambulance.id}</strong><br />
+            Status: {ambulance.status}
+          </Popup>
+        </Marker>
+      ))}
     </MapContainer>
   )
 }

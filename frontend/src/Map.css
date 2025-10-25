@@ -1,0 +1,7 @@
+
+.popup-content,
+.leaflet-popup-content {
+    background-color: #c62828;
+    color: white;
+    font-size: 1.25rem;
+}
