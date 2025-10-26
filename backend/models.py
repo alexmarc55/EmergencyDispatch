@@ -20,3 +20,19 @@ class IncidentDB(Base):
     lat = Column(Float)
     lon = Column(Float)
     assigned_unit = Column(Integer, default = None)
+    assigned_hospital = Column(Integer, nullable=True)
+
+class HospitalDB(Base):
+    __tablename__ = 'hospitals'
+    id = Column(Integer, primary_key= True, index = True)
+    name = Column(String)
+    type = Column(String) # UPU, CPU, Privat
+    lat = Column(Float)
+    lon = Column(Float)
+
+class EmergencyCentersDB(Base):
+    __tablename__ = 'emergency_centers'
+    id = Column(Integer, primary_key= True, index = True)
+    name = Column(String)
+    lat = Column(Float)
+    lon = Column(Float)

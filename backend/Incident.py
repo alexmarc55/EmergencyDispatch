@@ -8,3 +8,4 @@ class Incident(BaseModel):
     lat: float
     lon: float
     assigned_unit: Optional[int] = None
+    assigned_hospital: Optional[int] = None

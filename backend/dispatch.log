@@ -31,3 +31,42 @@
 2025-10-20 11:36:20,164 - INFO - Scheduler has been shut down
 2025-10-25 15:03:17,378 - INFO - Scheduler started
 2025-10-25 15:07:54,757 - INFO - Scheduler has been shut down
+2025-10-25 15:07:56,702 - INFO - Scheduler started
+2025-10-25 15:12:04,498 - INFO - Incident created: id=2 severity=1 status='Active' lat=47.6567 lon=23.585 assigned_unit=0
+2025-10-25 15:23:18,965 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-10-25 15:23:44,597 - INFO - Ambulance with ID 2 was successfully added to database.
+2025-10-26 13:27:16,456 - INFO - Scheduler has been shut down
+2025-10-26 13:27:23,213 - INFO - Scheduler started
+2025-10-26 13:28:08,643 - INFO - Scheduler started
+2025-10-26 13:43:58,357 - INFO - Scheduler has been shut down
+2025-10-26 13:43:58,673 - INFO - Scheduler has been shut down
+2025-10-26 13:44:01,179 - INFO - Scheduler started
+2025-10-26 13:44:01,427 - INFO - Scheduler started
+2025-10-26 13:47:45,391 - INFO - Scheduler has been shut down
+2025-10-26 13:47:45,695 - INFO - Scheduler has been shut down
+2025-10-26 13:47:49,016 - INFO - Scheduler started
+2025-10-26 13:47:49,298 - INFO - Scheduler started
+2025-10-26 13:56:23,804 - INFO - Scheduler has been shut down
+2025-10-26 13:56:24,013 - INFO - Scheduler has been shut down
+2025-10-26 13:56:26,824 - INFO - Scheduler started
+2025-10-26 13:56:27,005 - INFO - Scheduler started
+2025-10-26 13:56:27,964 - INFO - Scheduler has been shut down
+2025-10-26 14:04:48,998 - INFO - Scheduler has been shut down
+2025-10-26 14:04:50,708 - INFO - Scheduler started
+2025-10-26 14:04:50,806 - INFO - Scheduler has been shut down
+2025-10-26 14:04:58,951 - INFO - Scheduler started
+2025-10-26 14:05:06,172 - INFO - Scheduler has been shut down
+2025-10-26 14:05:07,759 - INFO - Scheduler started
+2025-10-26 14:05:12,751 - INFO - Scheduler has been shut down
+2025-10-26 14:05:14,562 - INFO - Scheduler started
+2025-10-26 14:08:17,977 - INFO - Scheduler has been shut down
+2025-10-26 14:08:20,416 - INFO - Scheduler started
+2025-10-26 14:33:17,388 - INFO - Scheduler has been shut down
+2025-10-26 14:33:19,730 - INFO - Scheduler started
+2025-10-26 14:34:14,035 - INFO - Scheduler has been shut down
+2025-10-26 14:34:16,373 - INFO - Scheduler started
+2025-10-26 14:34:17,143 - INFO - Scheduler has been shut down
+2025-10-26 14:35:39,213 - INFO - Scheduler started
+2025-10-26 14:42:58,827 - INFO - Scheduler has been shut down
+2025-10-26 14:43:00,740 - INFO - Scheduler started
+2025-10-26 14:49:26,364 - INFO - Scheduler has been shut down

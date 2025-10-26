@@ -48,11 +48,11 @@ export default function Map({ sidebarOpen, incidents, ambulances}) {
 
       {/* Render ambulance markers */}
       {ambulances.map(ambulance => (
-        <Marker 
+        <Marker className="popup-content"
           key={`ambulance-${ambulance.id}`} 
           position={[ambulance.lat, ambulance.lon]}
         >
-          <Popup>
+          <Popup className="popup-content">
             <strong>Ambulance #{ambulance.id}</strong><br />
             Status: {ambulance.status}
           </Popup>

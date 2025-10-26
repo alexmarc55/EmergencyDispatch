@@ -4,6 +4,8 @@ from Incident import *
 from Ambulance import *
 from ORS import *
 from GeoApify import *
+from Hospital import *
+from EmergencyCenter import *
 import math
 import models
 from models import *
@@ -59,37 +61,6 @@ class Status:
     RESOLVED = "Resolved"
 
 
-# Background job to return ambulance to service
-def return_ambulance_to_service(ambulance_id: int, incident_id: int):
-    """
-    Scheduled job that runs after ETA to return ambulance to base.
-    """
-    try:
-        db = SessionLocal()
-        
-        try:
-            ambulance = db.query(AmbulanceDB).filter(AmbulanceDB.id == ambulance_id).first()
-            if ambulance:
-                ambulance.status = "Available"
-                ambulance.lat = ambulance.default_lat
-                ambulance.lon = ambulance.default_lon
-                
-                db.commit()
-                db.refresh(ambulance)
-                
-                logger.info(
-                    f"Ambulance {ambulance_id} returned to service after handling "
-                    f"Incident {incident_id}. Returning to base: "
-                    f"({ambulance.default_lat}, {ambulance.default_lon})"
-                )
-            else:
-                logger.warning(f"Ambulance {ambulance_id} not found for return to service")
-        finally:
-            db.close()
-    
-    except Exception as e:
-        logger.error(f"Error returning ambulance {ambulance_id} to service: {e}")
-
 
 # Helper functions for incidents
 
@@ -104,7 +75,8 @@ def create_incident_in_db(incident: Incident, db: Session = Depends(get_db)):
         status=incident.status,
         lat=incident.lat,
         lon=incident.lon,
-        assigned_unit=incident.assigned_unit
+        assigned_unit=incident.assigned_unit,
+        assigned_hospital=incident.assigned_hospital
     )
     db.add(db_incident)
     db.commit()
@@ -119,7 +91,8 @@ def convert_incident_to_response(db_incident: Incident, db: Session = Depends(ge
         status=db_incident.status,
         lat=db_incident.lat,
         lon=db_incident.lon,
-        assigned_unit=db_incident.assigned_unit
+        assigned_unit=db_incident.assigned_unit,
+        assigned_hospital=db_incident.assigned_hospital
     )
     return created
 
@@ -130,6 +103,7 @@ def update_incident_in_db(db_incident: Incident, updated_incident: Incident, db:
     db_incident.lat = updated_incident.lat
     db_incident.lon = updated_incident.lon
     db_incident.assigned_unit = updated_incident.assigned_unit
+    db_incident.assigned_hospital = updated_incident.assigned_hospital
 
     db.commit()
     db.refresh(db_incident)
@@ -199,8 +173,114 @@ def get_available_ambulances(db: Session):
     ).all()
     return available
 
+def return_ambulance_to_service(ambulance_id: int, incident_id: int, db: SessionLocal = Depends(get_db)):
+    """
+    Scheduled job that runs after ETA to return ambulance to base.
+    """
+    try:
+
+        try:
+            ambulance = db.query(AmbulanceDB).filter(AmbulanceDB.id == ambulance_id).first()
+            if ambulance:
+                ambulance.status = "Available"
+                ambulance.lat = ambulance.default_lat
+                ambulance.lon = ambulance.default_lon
+                
+                db.commit()
+                db.refresh(ambulance)
+                
+                logger.info(
+                    f"Ambulance {ambulance_id} returned to service after handling "
+                    f"Incident {incident_id}. Returning to base: "
+                    f"({ambulance.default_lat}, {ambulance.default_lon})"
+                )
+            else:
+                logger.warning(f"Ambulance {ambulance_id} not found for return to service")
+        finally:
+            db.close()
+    
+    except Exception as e:
+        logger.error(f"Error returning ambulance {ambulance_id} to service: {e}")
+
+
+# Hospital helper functions
+
+def get_hospital_by_id(hospital_id: int, db: Session = Depends(get_db)):
+    hospital = db.query(HospitalDB).filter(HospitalDB.id == hospital_id).first()
+    return hospital
+
+def create_hospital_in_db(hospital: Hospital, db: Session = Depends(get_db)):
+    db_hospital = HospitalDB(
+        name=hospital.name,
+        type=hospital.type,
+        lat=hospital.lat,
+        lon=hospital.lon
+    )
+    db.add(db_hospital)
+    db.commit()
+    db.refresh(db_hospital)
+    logger.info(f"Hospital with ID {db_hospital.id} was successfully added to database.")
+    return db_hospital
+
+def convert_hospital_to_response(hospital: Hospital, db: Session = Depends(get_db)):
+    db_hospital = Hospital(
+        id=hospital.id,
+        name=hospital.name,
+        type=hospital.type,
+        lat=hospital.lat,
+        lon=hospital.lon
+    )
+    return db_hospital
+
+def update_hospital_in_db(hospital: Hospital, updated_hospital: Hospital, db: Session = Depends(get_db)):
+    hospital.name = updated_hospital.name
+    hospital.type = updated_hospital.type
+    hospital.lat = updated_hospital.lat
+    hospital.lon = updated_hospital.lon
+
+    db.commit()
+    db.refresh(hospital)
+    return hospital
+
+# Emergency Center helper functions
+
+def get_emergency_center_by_id(emergency_center_id: int, db: Session = Depends(get_db)):
+    emergency_center = db.query(EmergencyCentersDB).filter(EmergencyCentersDB.id == emergency_center_id).first()
+    return emergency_center
+
+def create_emergency_center_in_db(emergency_center: EmergencyCenter, db: Session = Depends(get_db)):
+    db_emergency_center = EmergencyCentersDB(
+        name=emergency_center.name,
+        lat=emergency_center.lat,
+        lon=emergency_center.lon
+    )
+    db.add(db_emergency_center)
+    db.commit()
+    db.refresh(db_emergency_center)
+    logger.info(f"Emergency Center with ID {db_emergency_center.id} was successfully added to database.")
+    return db_emergency_center
+
+def convert_emergency_center_to_response(emergency_center: EmergencyCenter, db: Session = Depends(get_db)):
+    db_emergency_center = EmergencyCenter(
+        id=emergency_center.id,
+        name=emergency_center.name,
+        lat=emergency_center.lat,
+        lon=emergency_center.lon
+    )
+    return db_emergency_center
+
+def update_emergency_center_in_db(emergency_center: EmergencyCenter, updated_emergency_center: EmergencyCenter, db: Session = Depends(get_db)):
+    emergency_center.name = updated_emergency_center.name
+    emergency_center.lat = updated_emergency_center.lat
+    emergency_center.lon = updated_emergency_center.lon
+
+    db.commit()
+    db.refresh(emergency_center)
+    return emergency_center
 
 # API ENDPOINTS
+
+# Incident Endpoints
 
 @app.post("/create_incident", response_model=Incident)
 async def create_incident(incident: Incident, db: Session = Depends(get_db)):
@@ -238,6 +318,7 @@ async def delete_incident(incident_id: int, db: Session = Depends(get_db)):
     logger.info(f"Incident with ID {incident_id} was successfully deleted!")
     return {"msg": "Incident was successfully deleted"}
 
+# Ambulance Endpoints
 
 @app.post("/create_ambulance", response_model=Ambulance)
 async def create_ambulance(ambulance: Ambulance, db: Session = Depends(get_db)):
@@ -292,6 +373,78 @@ async def ambulance_status(ambulance_id: int, db: Session = Depends(get_db)):
         "base_lon": ambulance.default_lon
     }
 
+# Hospital Endpoints
+
+@app.post("create_hospital", response_model=Hospital)
+async def create_hospital(hospital: Hospital, db: Session = Depends(get_db)):
+    hospiital = create_hospital_in_db(hospital, db)
+    created_hospital = convert_hospital_to_response(hospiital, db) 
+    return created_hospital
+
+@app.get("/hospitals")
+async def list_hospitals(db: Session = Depends(get_db)):
+    hospitals = db.query(HospitalDB).all()
+    return hospitals
+
+@app.put("/update_hospital")
+async def update_hospital(updated_hospital: Hospital, db: Session = Depends(get_db)):
+    hospital = get_hospital_by_id(updated_hospital.id, db)
+    if not hospital:
+        logger.warning(f"Hospital with ID {updated_hospital.id} was not found.")
+        raise HTTPException(status_code=404, detail="Hospital not found")
+    
+    updated = update_hospital_in_db(hospital, updated_hospital, db)
+    logger.info(f"Hospital with ID {updated.id} was successfully updated!")
+    return updated
+
+@app.delete("/delete_hospital")
+async def delete_hospital(hospital_id: int, db: Session = Depends(get_db)):
+    hospital = get_hospital_by_id(hospital_id, db)
+    if not hospital:
+        logger.warning(f"Hospital with ID {hospital_id} was not found.")
+        raise HTTPException(status_code=404, detail="Hospital not found")
+
+    db.delete(hospital)
+    db.commit()
+    logger.info(f"Hospital with ID {hospital_id} was successfully deleted!")
+    return {"msg": "Hospital was successfully deleted"}
+
+# Emergency Center Endpoints
+@app.post("create_emergency_center", response_model=EmergencyCenter)
+async def create_emergency_center(emergency_center: EmergencyCenter, db: Session = Depends(get_db)):
+    emergency_center_db = create_emergency_center_in_db(emergency_center, db)
+    created_emergency_center = convert_emergency_center_to_response(emergency_center_db, db) 
+    return created_emergency_center
+
+@app.get("/emergency_centers")
+async def list_emergency_centers(db: Session = Depends(get_db)):
+    emergency_centers = db.query(EmergencyCentersDB).all()
+    return emergency_centers
+
+@app.put("/update_emergency_center")
+async def update_emergency_center(updated_emergency_center: EmergencyCenter, db: Session = Depends(get_db)):
+    emergency_center = get_emergency_center_by_id(updated_emergency_center.id, db)
+    if not emergency_center:
+        logger.warning(f"Emergency Center with ID {updated_emergency_center.id} was not found.")
+        raise HTTPException(status_code=404, detail="Emergency Center not found")
+    
+    updated = update_emergency_center_in_db(emergency_center, updated_emergency_center, db)
+    logger.info(f"Emergency Center with ID {updated.id} was successfully updated!")
+    return updated
+
+@app.delete("/delete_emergency_center")
+async def delete_emergency_center(emergency_center_id: int, db: Session = Depends(get_db)):
+    emergency_center = get_emergency_center_by_id(emergency_center_id, db)
+    if not emergency_center:
+        logger.warning(f"Emergency Center with ID {emergency_center_id} was not found.")
+        raise HTTPException(status_code=404, detail="Emergency Center not found")
+
+    db.delete(emergency_center)
+    db.commit()
+    logger.info(f"Emergency Center with ID {emergency_center_id} was successfully deleted!")
+    return {"msg": "Emergency Center was successfully deleted"}
+    
+# Emergency Dispatch Endpoints
 
 @app.post("/dispatch/{incident_id}")
 async def dispatch(incident_id: int, db: Session = Depends(get_db)):
@@ -316,6 +469,9 @@ async def dispatch(incident_id: int, db: Session = Depends(get_db)):
     # Get available ambulances
     available_ambulances = get_available_ambulances(db)
 
+    # Get hospitals
+    hospitals = db.query(HospitalDB).all()
+    
     if not available_ambulances:
         logger.warning(f"Dispatch failed: No available ambulances for incident {incident_id}")
         return {
@@ -348,8 +504,9 @@ async def dispatch(incident_id: int, db: Session = Depends(get_db)):
 
     # Dispatch ambulance
     best_amb, eta = get_eta(available_ambulances, incident)
+    closest_hospital , hospital_eta = get_eta(hospitals, incident)
 
-    if best_amb and eta is not None:
+    if best_amb and eta is not None and closest_hospital and hospital_eta is not None:
         # Update ambulance status
         best_amb.status = "Busy"
         best_amb.lat = incident.lat
@@ -358,15 +515,19 @@ async def dispatch(incident_id: int, db: Session = Depends(get_db)):
         # Update incident status
         incident.status = "Resolved"
         incident.assigned_unit = best_amb.id
+        incident.assigned_hospital = closest_hospital.id
 
         db.commit()
         db.refresh(incident)
         db.refresh(best_amb)
 
+        scene_time = 10  # minutes spent at the incident scene
+        hospital_time = 10 # minutes spent at the hospital
+
+        total_time = eta + scene_time + hospital_eta + hospital_time
         # Schedule job to return ambulance to service
-        return_time = datetime.now() + timedelta(minutes=eta * 2) # Here we do twice the size of the eta
-                                                                  # because the ambulance also needs to
-                                                                  # return back
+        return_time = datetime.now() + timedelta(minutes= total_time)
+
         scheduler.add_job(
             return_ambulance_to_service,
             trigger=DateTrigger(run_date=return_time),
@@ -377,29 +538,42 @@ async def dispatch(incident_id: int, db: Session = Depends(get_db)):
 
         logger.info(
             f"Ambulance {best_amb.id} dispatched to Incident {incident.id} "
-            f"(severity {incident.severity}) - ETA: {eta} min. "
-            f"Scheduled return at {return_time.strftime('%H:%M:%S')}"
+            f"(severity {incident.severity}), then to Hospital {closest_hospital.id} ({closest_hospital.name}). "
+            f"Journey: {eta}min (to incident) + {scene_time}min (scene) + {hospital_eta}min (to hospital) "
+            f"+ {hospital_time}min (at hospital) = {total_time}min total. "
+            f"Available at {return_time.strftime('%H:%M:%S')}"
         )
 
         return {
             "msg": f"Ambulance {best_amb.id} dispatched",
-            "eta_minutes": eta,
-            "estimated_return_time": return_time.isoformat(),
+            "ambulance_to_incident_eta": eta,
+            "scene_time": scene_time,
+            "incident_to_hospital_eta": hospital_eta,
+            "hospital_time": hospital_time,
+            "total_time_minutes": total_time,
+            "estimated_available_time": return_time.isoformat(),
+            "hospital": {
+                "id": closest_hospital.id,
+                "name": closest_hospital.name,
+                "lat": closest_hospital.lat,
+                "lon": closest_hospital.lon
+            },
             "incident": {
                 "id": incident.id,
                 "severity": incident.severity,
                 "status": incident.status,
-                "assigned_unit": incident.assigned_unit
+                "assigned_unit": incident.assigned_unit,
+                "assigned_hospital": incident.assigned_hospital
             },
             "ambulance": {
                 "id": best_amb.id,
                 "status": best_amb.status,
                 "current_location": {"lat": best_amb.lat, "lon": best_amb.lon}
             }
-        }
+       }
     else:
         logger.warning(f"Could not calculate ETA for incident {incident_id}")
-        return {"msg": "Could not find suitable ambulance or calculate route"}
+        return {"msg": "Could not find suitable ambulance/hospital or calculate route"}
 
 
 @app.post("/dispatch_all")
