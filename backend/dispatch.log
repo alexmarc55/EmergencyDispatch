@@ -70,3 +70,832 @@
 2025-10-26 14:42:58,827 - INFO - Scheduler has been shut down
 2025-10-26 14:43:00,740 - INFO - Scheduler started
 2025-10-26 14:49:26,364 - INFO - Scheduler has been shut down
+2025-10-26 14:49:28,745 - INFO - Scheduler started
+2025-10-26 15:29:17,349 - INFO - Scheduler has been shut down
+2025-10-26 15:29:19,224 - INFO - Scheduler started
+2025-10-30 15:21:32,876 - INFO - Scheduler started
+2025-10-30 15:25:54,392 - INFO - Scheduler has been shut down
+2025-10-30 15:26:05,206 - INFO - Scheduler started
+2025-10-30 15:27:48,717 - INFO - Incident created: id=1 severity=1 status='Active' lat=47.6567 lon=23.585 assigned_unit=None assigned_hospital=None
+2025-10-30 15:28:12,288 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-10-30 15:29:04,717 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 15:30:05,844 - INFO - Scheduler has been shut down
+2025-10-30 15:30:07,768 - INFO - Scheduler started
+2025-10-30 15:30:17,376 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 15:32:28,337 - INFO - Scheduler has been shut down
+2025-10-30 15:32:30,437 - INFO - Scheduler started
+2025-10-30 15:32:39,946 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 15:33:25,207 - INFO - Scheduler has been shut down
+2025-10-30 15:33:26,748 - INFO - Scheduler started
+2025-10-30 15:33:35,283 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 15:40:50,495 - INFO - Scheduler has been shut down
+2025-10-30 15:40:51,738 - INFO - Scheduler started
+2025-10-30 15:40:52,850 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 15:40:53,648 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 15:42:57,641 - INFO - Scheduler has been shut down
+2025-10-30 15:42:59,586 - INFO - Scheduler started
+2025-10-30 15:43:09,593 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 15:51:43,202 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 15:53:15,781 - INFO - Scheduler has been shut down
+2025-10-30 15:53:17,976 - INFO - Scheduler started
+2025-10-30 15:53:24,657 - INFO - Scheduler has been shut down
+2025-10-30 15:53:26,234 - INFO - Scheduler started
+2025-10-30 15:53:32,784 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 15:53:45,764 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 15:55:36,344 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 15:57:05,711 - INFO - Scheduler has been shut down
+2025-10-30 15:57:07,737 - INFO - Scheduler started
+2025-10-30 15:57:23,397 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 16:01:58,063 - INFO - Scheduler started
+2025-10-30 16:02:19,470 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 16:11:20,309 - INFO - Scheduler has been shut down
+2025-10-30 16:11:22,852 - INFO - Scheduler started
+2025-10-30 16:11:34,062 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 16:11:56,589 - INFO - Scheduler has been shut down
+2025-10-30 16:11:58,688 - INFO - Scheduler started
+2025-10-30 16:15:01,357 - INFO - Scheduler has been shut down
+2025-10-30 16:15:03,149 - INFO - Scheduler started
+2025-10-30 16:15:22,711 - WARNING - Could not calculate ETA for incident 1
+2025-10-30 16:17:26,872 - INFO - Scheduler has been shut down
+2025-10-30 16:17:28,384 - INFO - Scheduler started
+2025-10-30 16:19:29,760 - INFO - Scheduler has been shut down
+2025-10-30 16:19:31,378 - INFO - Scheduler started
+2025-10-30 16:19:54,854 - INFO - Hospital with ID 1 was successfully added to database.
+2025-10-30 16:20:10,153 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-10-30 16:20:10,154 - INFO - Ambulance 1 dispatched to Incident 1 (severity 1), then to Hospital 1 (opris). Journey: 3.0min (to incident) + 10min (scene) + 5.7min (to hospital) + 10min (at hospital) = 28.7min total. Available at 16:48:52
+2025-10-30 16:20:10,732 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:13,564 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:17,212 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:19,949 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:22,582 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:25,840 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:28,905 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:31,944 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:34,878 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:37,923 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:41,280 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:45,188 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:48,363 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:51,315 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:54,229 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:20:57,202 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:00,246 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:03,282 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:06,260 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:09,232 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:12,281 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:15,301 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:18,264 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:21,228 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:29,193 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:29,724 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:30,283 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:33,361 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:36,378 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:44,129 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:44,554 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:45,599 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:48,663 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:51,647 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:57,239 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:21:58,207 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:00,722 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:03,640 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:06,799 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:14,096 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:14,704 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:15,854 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:18,802 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:26,238 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:26,900 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:27,999 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:30,918 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:35,969 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:36,908 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:39,994 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:42,925 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:45,876 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:51,742 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:52,317 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:56,929 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:22:58,208 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:01,227 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:04,493 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:07,405 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:10,433 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:13,367 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:16,248 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:19,268 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:22,219 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:27,298 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:33,203 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:33,918 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:34,456 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:37,383 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:40,319 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:44,179 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:46,471 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:49,538 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:52,534 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:55,545 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:23:58,561 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:01,551 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:04,531 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:07,639 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:10,620 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:13,678 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:16,823 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:19,660 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:22,711 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:25,756 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:33,241 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:34,009 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:34,898 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:37,732 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:40,763 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:47,251 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:47,876 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:49,859 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:52,874 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:55,898 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:24:58,922 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:01,994 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:04,939 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:13,018 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:13,681 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:14,423 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:17,082 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:20,066 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:23,919 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:25,995 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:29,100 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:32,981 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:35,239 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:38,128 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:38,242 - INFO - Scheduler has been shut down
+2025-10-30 16:25:40,134 - INFO - Scheduler started
+2025-10-30 16:25:41,138 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:44,067 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:46,993 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:50,400 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:53,435 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:56,460 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:25:59,682 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:26:02,798 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:26:05,479 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:26:08,560 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:26:11,529 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:26:14,503 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:26:17,605 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:26:20,384 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:26:23,392 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:26:26,391 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:26:29,413 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-10-30 16:26:29,733 - INFO - Scheduler has been shut down
+2025-11-03 08:34:23,825 - INFO - Scheduler started
+2025-11-03 08:35:40,178 - INFO - Incident created: id=2 severity=0 status='Active' lat=46.6567 lon=23.585 assigned_unit=0 assigned_hospital=0
+2025-11-03 08:36:00,761 - WARNING - Dispatch failed: No available ambulances for incident 2
+2025-11-03 08:37:37,978 - INFO - Ambulance with ID 2 was successfully added to database.
+2025-11-03 08:37:46,013 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-03 08:37:46,019 - INFO - Ambulance 2 dispatched to Incident 2 (severity 0), then to Hospital 1 (opris). Journey: 177.2min (to incident) + 10min (scene) + 177.1min (to hospital) + 10min (at hospital) = 374.29999999999995min total. Available at 14:52:04
+2025-11-03 08:38:40,812 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:38:41,351 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:38:41,916 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:38:42,852 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:38:44,530 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:38:45,597 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:38:47,123 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:38:48,166 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:38:50,284 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:38:51,287 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:38:52,719 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:38:53,722 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:38:54,803 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:38:56,062 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:38:57,112 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:38:58,198 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:38:59,339 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:00,586 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:01,656 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:07,118 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:08,312 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:09,544 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:10,555 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:11,604 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:12,658 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:13,686 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:14,782 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:15,852 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:16,882 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:17,920 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:19,924 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:20,915 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:22,999 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:24,033 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:26,036 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:27,043 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:29,356 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:30,368 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:32,392 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:33,453 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:35,500 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:36,484 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:38,493 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:39,450 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:41,558 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:42,533 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:44,669 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:45,679 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:47,706 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:48,667 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:50,685 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:51,721 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:53,723 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:54,696 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:39:56,704 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:39:57,699 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:02,309 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:03,288 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:04,250 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:09,985 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:11,004 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:12,014 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:13,014 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:14,009 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:15,017 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:16,027 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:17,021 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:17,970 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:18,991 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:19,978 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:21,065 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:22,135 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:24,057 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:25,194 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:27,118 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:28,107 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:30,084 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:31,100 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:33,083 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:34,144 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:36,087 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:37,121 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:39,190 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:40,158 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:42,172 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:43,183 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:45,288 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:46,293 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:48,258 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:49,201 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:51,306 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:52,304 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:54,317 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:55,343 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:40:57,439 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:40:58,437 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:00,477 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:01,435 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:03,491 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:04,459 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:06,484 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:07,454 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:09,437 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:10,414 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:12,522 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:13,510 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:15,515 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:16,522 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:18,535 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:19,515 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:21,608 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:22,582 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:24,615 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:25,630 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:27,696 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:28,716 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:30,723 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:31,734 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:33,729 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:34,744 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:36,904 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:37,916 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:39,833 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:40,851 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:42,818 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:43,785 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:45,766 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:46,793 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:48,790 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:49,835 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:51,869 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:52,868 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:54,847 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:55,821 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:41:57,953 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:41:58,947 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:00,908 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:01,929 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:04,126 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:05,144 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:07,118 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:08,138 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:10,170 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:11,166 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:13,220 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:14,264 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:20,641 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:21,699 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:22,729 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:23,710 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:24,718 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:25,741 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:26,767 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:27,783 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:28,827 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:29,821 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:31,363 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:32,410 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:34,377 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:35,375 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:37,401 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:38,380 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:40,414 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:41,427 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:43,483 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:44,524 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:46,445 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:47,458 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:49,631 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:50,637 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:42:52,654 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:42:53,659 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:00,679 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:01,690 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:02,694 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:03,734 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:04,706 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:05,737 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:06,758 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:07,770 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:08,787 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:09,794 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:10,831 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:11,868 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:13,965 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:14,939 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:17,004 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:17,965 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:19,994 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:20,942 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:23,019 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:23,979 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:25,949 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:26,949 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:29,023 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:30,042 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:32,090 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:33,046 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:35,152 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:36,186 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:38,175 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:39,169 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:41,120 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:42,098 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:44,131 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:45,078 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:47,177 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:48,151 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:50,222 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:51,277 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:57,606 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:43:58,909 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:43:59,919 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:00,923 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:01,840 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:02,852 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:03,822 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:04,834 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:05,789 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:06,896 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:08,321 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:09,311 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:11,333 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:12,595 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:14,370 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:15,418 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:17,561 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:18,598 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:20,609 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:21,656 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:23,682 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:24,739 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:26,738 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:27,756 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:29,933 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:30,967 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:33,028 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:34,111 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:36,084 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:37,122 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:39,075 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:40,112 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:42,031 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:43,035 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:45,250 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:46,305 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:48,381 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:49,421 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:51,471 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:52,528 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:54,486 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:55,541 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:44:57,500 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:44:58,489 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:00,561 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:01,515 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:03,597 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:04,632 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:10,099 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:11,129 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:12,159 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:13,182 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:14,168 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:15,173 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:16,193 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:17,216 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:18,613 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:19,640 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:21,918 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:22,935 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:24,974 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:25,977 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:28,026 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:29,030 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:31,137 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:32,154 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:34,112 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:35,110 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:37,141 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:38,136 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:40,200 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:41,188 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:43,227 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:44,230 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:46,293 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:47,274 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:49,334 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:50,334 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:52,401 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:53,414 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:55,397 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:56,393 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:45:58,492 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:45:59,480 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:01,482 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:02,503 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:04,526 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:05,522 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:07,578 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:08,564 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:10,602 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:11,593 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:13,646 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:14,643 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:16,613 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:17,623 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:19,672 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:20,686 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:22,716 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:23,725 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:25,678 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:26,661 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:28,684 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:29,659 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:31,798 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:32,826 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:34,861 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:37,024 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:38,065 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:39,072 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:41,108 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:42,124 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:44,091 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:45,071 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:47,124 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:48,123 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:50,209 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:51,202 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:53,229 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:54,256 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:56,318 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:46:57,335 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:46:59,278 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:00,277 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:02,280 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:03,297 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:05,336 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:06,339 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:08,383 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:09,374 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:11,414 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:12,370 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:14,462 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:15,463 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:17,484 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:18,448 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:20,553 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:21,507 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:23,548 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:24,521 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:26,611 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:27,643 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:29,576 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:30,562 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:32,683 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:33,701 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:35,775 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:36,782 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:38,837 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:39,873 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:42,125 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:43,104 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:45,120 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:46,121 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:48,157 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:49,159 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:51,138 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:52,174 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:54,201 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:55,197 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:47:57,203 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:47:58,211 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:00,276 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:01,207 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:03,291 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:04,305 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:06,329 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:07,313 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:09,359 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:10,332 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:12,397 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:13,372 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:15,378 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:16,366 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:18,398 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:19,404 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:21,448 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:22,416 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:24,604 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:25,871 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:27,674 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:28,754 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:31,213 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:32,229 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:34,125 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:34,721 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:36,612 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:37,166 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:39,636 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:40,201 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:42,679 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:43,244 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:46,032 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:46,560 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:48,996 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:54,650 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:55,275 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:55,822 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:56,409 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:56,996 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:48:58,031 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:48:58,616 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:04,771 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:05,382 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:05,952 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:06,507 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:07,085 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:07,673 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:10,080 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:10,620 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:13,109 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:13,706 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:16,130 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:16,694 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:19,086 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:19,632 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:22,127 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:22,665 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:25,192 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:25,724 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:28,141 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:28,685 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:31,163 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:31,744 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:34,204 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:34,764 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:37,291 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:37,788 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:40,375 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:40,962 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:43,744 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:44,329 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:46,610 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:47,159 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:49,627 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:50,224 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:52,542 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:53,148 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:55,589 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:56,159 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:49:58,617 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:49:59,178 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:50:01,664 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 08:50:02,233 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 2 to Incident 2
+2025-11-03 08:50:02,351 - INFO - Scheduler has been shut down
+2025-11-03 09:27:49,799 - INFO - Scheduler started
+2025-11-03 09:27:55,701 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 09:27:56,401 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 09:27:56,985 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 09:27:57,659 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-03 09:27:57,768 - INFO - Scheduler has been shut down
+2025-11-05 19:44:47,601 - INFO - Scheduler started
+2025-11-05 19:45:05,016 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-05 19:45:06,003 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-05 19:45:07,098 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-05 19:45:08,208 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-05 19:45:13,491 - INFO - Scheduler has been shut down
+2025-11-05 19:45:15,547 - INFO - Scheduler started
+2025-11-05 19:47:22,869 - INFO - Incident created: id=3 severity=1 status='Active' lat=47.6567 lon=23.75 assigned_unit=1 assigned_hospital=1
+2025-11-05 19:50:55,116 - INFO - Scheduler has been shut down
+2025-11-05 19:50:57,043 - INFO - Scheduler started
+2025-11-05 19:53:02,312 - INFO - Incident created: id=4 severity=1 status='Active' lat=44.4268 lon=26.1025 assigned_unit=None assigned_hospital=None
+2025-11-05 19:53:54,127 - INFO - Ambulance with ID 3 was successfully added to database.
+2025-11-05 19:54:12,821 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-05 19:54:13,423 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-05 19:54:14,253 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-05 19:54:14,867 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-05 19:54:27,999 - INFO - Incident 4 (severity 1) not in priority queue
+2025-11-05 19:54:42,663 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-05 19:54:42,664 - INFO - Batch dispatch: Ambulance 3 -> Incident 3 (severity 1). Return scheduled at 05:24:12
+2025-11-05 20:09:09,738 - INFO - Scheduler has been shut down
+2025-11-05 20:09:11,675 - INFO - Scheduler started
+2025-11-05 20:09:38,901 - INFO - Ambulance with ID 4 was successfully added to database.
+2025-11-05 20:09:50,548 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-05 20:09:50,551 - INFO - Batch dispatch: Ambulance 4 -> Incident 4 (severity 1). Return scheduled at 04:52:20
+2025-11-05 20:11:10,184 - INFO - Incident created: id=5 severity=1 status='Active' lat=44.44 lon=26.12 assigned_unit=None assigned_hospital=None
+2025-11-05 20:11:19,448 - INFO - Ambulance with ID 5 was successfully added to database.
+2025-11-05 20:11:33,866 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-05 20:11:33,869 - INFO - Ambulance 5 dispatched to Incident 5 (severity 1), then to Hospital 1 (opris). Journey: 5.1min (to incident) + 10min (scene) + 502.3min (to hospital) + 10min (at hospital) = 527.4min total. Available at 04:58:57
+2025-11-05 20:12:10,274 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-05 20:12:11,454 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-05 20:12:12,450 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-05 20:12:13,448 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-05 20:12:20,934 - INFO - Scheduler has been shut down
+2025-11-09 12:12:55,735 - INFO - Scheduler started
+2025-11-09 12:15:54,724 - INFO - Incident created: id=6 severity=4 status='Active' lat=47.6581 lon=23.5812 assigned_unit=None assigned_hospital=0
+2025-11-09 12:16:08,641 - INFO - Ambulance with ID 6 was successfully added to database.
+2025-11-09 12:16:30,280 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 12:16:30,282 - INFO - Ambulance 6 dispatched to Incident 6 (severity 4), then to Hospital 1 (opris). Journey: 2.0min (to incident) + 10min (scene) + 6.2min (to hospital) + 10min (at hospital) = 28.2min total. Available at 12:44:42
+2025-11-09 12:17:08,989 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-09 12:17:09,657 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-09 12:17:10,651 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-09 12:17:11,608 - WARNING - Route retrieval failed: Could not get route geometry for Ambulance 1 to Incident 1
+2025-11-09 12:18:20,381 - INFO - Scheduler has been shut down
+2025-11-09 12:18:22,449 - INFO - Scheduler started
+2025-11-09 12:19:23,043 - INFO - Scheduler has been shut down
+2025-11-09 12:19:25,046 - INFO - Scheduler started
+2025-11-09 12:19:54,339 - INFO - Scheduler has been shut down
+2025-11-09 12:19:56,560 - INFO - Scheduler started
+2025-11-09 12:20:43,598 - INFO - Incident created: id=7 severity=3 status='Active' lat=47.6615 lon=23.579 assigned_unit=None assigned_hospital=0
+2025-11-09 12:21:05,786 - INFO - Ambulance with ID 7 was successfully added to database.
+2025-11-09 12:21:22,209 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 12:21:22,211 - INFO - Ambulance 7 dispatched to Incident 7 (severity 3), then to Hospital 1 (opris). Journey: 7.0min (to incident) + 10min (scene) + 5.6min (to hospital) + 10min (at hospital) = 32.6min total. Available at 12:53:58
+2025-11-09 12:31:52,519 - INFO - Scheduler has been shut down
+2025-11-09 12:31:54,246 - INFO - Scheduler started
+2025-11-09 12:32:17,863 - INFO - Scheduler has been shut down
+2025-11-09 12:32:19,560 - INFO - Scheduler started
+2025-11-09 12:32:25,972 - INFO - Scheduler has been shut down
+2025-11-09 12:38:33,733 - INFO - Scheduler started
+2025-11-09 12:39:47,338 - INFO - Incident created: id=1 severity=2 status='Active' lat=47.658 lon=23.575 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 12:40:04,871 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-09 12:40:14,748 - WARNING - Could not calculate ETA for incident 1
+2025-11-09 12:41:46,447 - INFO - Scheduler has been shut down
+2025-11-09 12:41:48,346 - INFO - Scheduler started
+2025-11-09 12:41:51,287 - WARNING - Could not calculate ETA for incident 1
+2025-11-09 12:44:26,646 - INFO - Hospital with ID 1 was successfully added to database.
+2025-11-09 12:44:37,482 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 13:02:02,899 - INFO - Incident created: id=2 severity=4 status='Active' lat=47.659 lon=23.578 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 13:03:45,752 - INFO - Ambulance with ID 2 was successfully added to database.
+2025-11-09 13:04:08,347 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 13:05:47,400 - INFO - Scheduler has been shut down
+2025-11-09 13:05:49,718 - INFO - Scheduler started
+2025-11-09 13:08:48,715 - INFO - Incident created: id=3 severity=2 status='Active' lat=47.656 lon=23.58 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 13:09:10,618 - INFO - Ambulance with ID 3 was successfully added to database.
+2025-11-09 13:09:40,731 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 13:12:55,974 - INFO - Scheduler has been shut down
+2025-11-09 13:12:57,484 - INFO - Scheduler started
+2025-11-09 13:23:06,552 - INFO - Ambulance with ID 4 was successfully added to database.
+2025-11-09 13:23:36,730 - INFO - Incident created: id=4 severity=5 status='Active' lat=47.661 lon=23.576 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 13:23:53,880 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 13:28:55,556 - INFO - Scheduler has been shut down
+2025-11-09 13:28:57,090 - INFO - Scheduler started
+2025-11-09 13:30:07,297 - INFO - Scheduler has been shut down
+2025-11-09 13:30:17,027 - INFO - Scheduler started
+2025-11-09 13:30:35,477 - INFO - Hospital with ID 1 was successfully added to database.
+2025-11-09 13:31:06,156 - INFO - Incident created: id=1 severity=4 status='Active' lat=47.659 lon=23.578 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 13:31:24,311 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-09 13:31:56,034 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 13:35:09,294 - INFO - Scheduler started
+2025-11-09 13:35:10,880 - INFO - Ambulance with ID 2 was successfully added to database.
+2025-11-09 13:35:52,960 - INFO - Incident created: id=2 severity=5 status='Active' lat=47.6585 lon=23.5765 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 13:36:17,583 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 13:37:34,414 - INFO - Scheduler has been shut down
+2025-11-09 13:37:36,098 - INFO - Scheduler started
+2025-11-09 13:37:53,540 - INFO - Scheduler has been shut down
+2025-11-09 13:38:02,529 - INFO - Scheduler started
+2025-11-09 13:38:12,918 - INFO - Incident created: id=1 severity=5 status='Active' lat=47.6585 lon=23.5765 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 13:38:18,816 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-09 13:38:27,641 - INFO - Hospital with ID 1 was successfully added to database.
+2025-11-09 13:39:07,387 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 13:39:42,664 - INFO - Scheduler has been shut down
+2025-11-09 13:39:51,314 - INFO - Scheduler started
+2025-11-09 13:39:57,521 - INFO - Hospital with ID 1 was successfully added to database.
+2025-11-09 13:40:01,519 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-09 13:40:05,638 - INFO - Incident created: id=1 severity=5 status='Active' lat=47.6585 lon=23.5765 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 13:40:18,041 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 13:40:18,042 - INFO - Batch dispatch: Ambulance 1 -> Incident 1 (severity 5). Return scheduled at 13:51:24
+2025-11-09 13:51:24,061 - INFO - Running job "return_ambulance_to_service (trigger: date[2025-11-09 13:51:24 EET], next run at: 2025-11-09 13:51:24 EET)" (scheduled at 2025-11-09 13:51:24.041636+02:00)
+2025-11-09 13:51:24,061 - INFO - Removed job amb_1_incident_1
+2025-11-09 13:51:24,061 - ERROR - Error returning ambulance 1 to service: 'Depends' object has no attribute 'close'
+2025-11-09 13:51:24,062 - INFO - Job "return_ambulance_to_service (trigger: date[2025-11-09 13:51:24 EET], next run at: 2025-11-09 13:51:24 EET)" executed successfully
+2025-11-09 14:12:17,044 - INFO - Scheduler has been shut down
+2025-11-09 14:26:45,706 - INFO - Scheduler started
+2025-11-09 14:27:06,772 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-09 14:27:10,303 - INFO - Incident created: id=1 severity=5 status='Active' lat=47.6585 lon=23.5765 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 14:27:18,515 - INFO - Hospital with ID 1 was successfully added to database.
+2025-11-09 14:27:42,125 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 14:28:05,519 - INFO - Scheduler has been shut down
+2025-11-09 14:28:07,326 - INFO - Scheduler started
+2025-11-09 14:28:25,905 - INFO - Scheduler has been shut down
+2025-11-09 14:28:36,163 - INFO - Scheduler started
+2025-11-09 14:28:38,898 - INFO - Incident created: id=1 severity=5 status='Active' lat=47.6585 lon=23.5765 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 14:28:43,552 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-09 14:28:47,710 - INFO - Hospital with ID 1 was successfully added to database.
+2025-11-09 14:28:55,189 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 14:30:45,449 - INFO - Scheduler has been shut down
+2025-11-09 14:33:25,184 - INFO - Scheduler started
+2025-11-09 14:33:40,546 - INFO - Incident created: id=1 severity=5 status='Active' lat=47.6585 lon=23.5765 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 14:33:45,108 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-09 14:33:49,115 - INFO - Hospital with ID 1 was successfully added to database.
+2025-11-09 14:34:00,996 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 14:36:49,628 - INFO - Scheduler has been shut down
+2025-11-09 14:36:51,334 - INFO - Scheduler started
+2025-11-09 14:36:51,490 - INFO - Scheduler has been shut down
+2025-11-09 14:37:54,811 - INFO - Scheduler started
+2025-11-09 14:37:59,898 - WARNING - Dispatch failed: Incident 1 not found or not active
+2025-11-09 14:39:03,793 - INFO - Scheduler has been shut down
+2025-11-09 14:41:24,323 - INFO - Scheduler started
+2025-11-09 14:41:28,250 - INFO - Scheduler has been shut down
+2025-11-09 14:43:04,915 - INFO - Scheduler started
+2025-11-09 14:43:05,154 - INFO - Scheduler has been shut down
+2025-11-09 14:46:57,269 - INFO - Scheduler started
+2025-11-09 14:47:06,680 - INFO - Incident created: id=1 severity=5 status='Active' lat=47.6585 lon=23.5765 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 14:47:12,265 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-09 14:47:17,043 - INFO - Hospital with ID 1 was successfully added to database.
+2025-11-09 14:47:28,870 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 14:51:19,027 - INFO - Scheduler has been shut down
+2025-11-09 14:51:30,785 - INFO - Scheduler started
+2025-11-09 14:51:34,068 - INFO - Incident created: id=1 severity=5 status='Active' lat=47.6585 lon=23.5765 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 14:51:38,455 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-09 14:51:46,887 - INFO - Hospital with ID 1 was successfully added to database.
+2025-11-09 14:52:01,364 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 14:52:18,119 - INFO - Scheduler has been shut down
+2025-11-09 14:52:19,728 - INFO - Scheduler started
+2025-11-09 14:52:26,507 - INFO - Scheduler has been shut down
+2025-11-09 14:52:37,656 - INFO - Scheduler started
+2025-11-09 14:52:46,337 - INFO - Hospital with ID 1 was successfully added to database.
+2025-11-09 14:52:50,876 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-09 14:52:54,495 - INFO - Incident created: id=1 severity=5 status='Active' lat=47.6585 lon=23.5765 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 14:53:04,645 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 14:53:04,661 - ERROR - Error animating ambulance 1: name 'incident_id' is not defined
+2025-11-09 14:53:20,992 - INFO - Scheduler has been shut down
+2025-11-09 14:53:59,641 - INFO - Scheduler started
+2025-11-09 14:54:06,851 - INFO - Hospital with ID 1 was successfully added to database.
+2025-11-09 14:54:12,270 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-09 14:54:16,220 - INFO - Incident created: id=1 severity=5 status='Active' lat=47.6585 lon=23.5765 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-09 14:54:25,294 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-09 14:54:25,311 - INFO - Ambulance 1 starting journey to incident 1
+2025-11-09 14:55:01,445 - INFO - Ambulance 1 arrived at incident 1
+2025-11-09 15:00:01,453 - INFO - Ambulance 1 heading to hospital
+2025-11-09 15:00:31,684 - INFO - Ambulance 1 arrived at hospital
+2025-11-09 15:05:31,308 - INFO - Running job "return_ambulance_to_service (trigger: date[2025-11-09 15:05:31 EET], next run at: 2025-11-09 15:05:31 EET)" (scheduled at 2025-11-09 15:05:31.294112+02:00)
+2025-11-09 15:05:31,308 - INFO - Removed job amb_1_incident_1
+2025-11-09 15:05:31,308 - ERROR - Error returning ambulance 1 to service: 'Depends' object has no attribute 'close'
+2025-11-09 15:05:31,309 - INFO - Job "return_ambulance_to_service (trigger: date[2025-11-09 15:05:31 EET], next run at: 2025-11-09 15:05:31 EET)" executed successfully
+2025-11-09 15:05:31,691 - INFO - Ambulance 1 completed hospital procedures
+2025-11-09 15:06:46,634 - INFO - Scheduler has been shut down
+2025-11-09 15:07:24,586 - INFO - Scheduler started
+2025-11-09 15:07:34,550 - INFO - Scheduler has been shut down
+2025-11-09 15:07:49,537 - INFO - Scheduler started
+2025-11-09 15:07:49,612 - INFO - Scheduler has been shut down

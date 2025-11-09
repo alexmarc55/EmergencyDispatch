@@ -1,5 +1,5 @@
 import logging
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from Incident import *
 from Ambulance import *
 from ORS import *
@@ -16,7 +16,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.date import DateTrigger
 from fastapi.middleware.cors import CORSMiddleware
 import atexit
-
+import asyncio
 
 logging.basicConfig(
     level=logging.INFO,
@@ -59,6 +59,9 @@ def get_db():
 class Status:
     ACTIVE = "Active"
     RESOLVED = "Resolved"
+    ASSIGNED = "Assigned"
+    AVAILABLE = "Available"
+    BUSY = "Busy"
 
 
 
@@ -169,25 +172,27 @@ def update_ambulance_in_db(ambulance: Ambulance, updated_ambulance: Ambulance, d
 def get_available_ambulances(db: Session):
     """Get all ambulances with 'Available' status"""
     available = db.query(AmbulanceDB).filter(
-        AmbulanceDB.status == "Available"
+        AmbulanceDB.status == Status.AVAILABLE
     ).all()
     return available
 
-def return_ambulance_to_service(ambulance_id: int, incident_id: int, db: SessionLocal = Depends(get_db)):
+def return_ambulance_to_service(ambulance_id: int, incident_id: int, db: Session = Depends(get_db)):
     """
     Scheduled job that runs after ETA to return ambulance to base.
     """
     try:
 
-        try:
-            ambulance = db.query(AmbulanceDB).filter(AmbulanceDB.id == ambulance_id).first()
+            ambulance = get_ambulance_by_id(ambulance_id, db)
+            incident = get_incident_by_id(incident_id, db)
             if ambulance:
-                ambulance.status = "Available"
+                ambulance.status = Status.AVAILABLE
                 ambulance.lat = ambulance.default_lat
                 ambulance.lon = ambulance.default_lon
+                incident.status = Status.RESOLVED
                 
                 db.commit()
                 db.refresh(ambulance)
+                db.refresh(incident)
                 
                 logger.info(
                     f"Ambulance {ambulance_id} returned to service after handling "
@@ -196,9 +201,7 @@ def return_ambulance_to_service(ambulance_id: int, incident_id: int, db: Session
                 )
             else:
                 logger.warning(f"Ambulance {ambulance_id} not found for return to service")
-        finally:
-            db.close()
-    
+ 
     except Exception as e:
         logger.error(f"Error returning ambulance {ambulance_id} to service: {e}")
 
@@ -375,7 +378,7 @@ async def ambulance_status(ambulance_id: int, db: Session = Depends(get_db)):
 
 # Hospital Endpoints
 
-@app.post("create_hospital", response_model=Hospital)
+@app.post("/create_hospital", response_model=Hospital)
 async def create_hospital(hospital: Hospital, db: Session = Depends(get_db)):
     hospiital = create_hospital_in_db(hospital, db)
     created_hospital = convert_hospital_to_response(hospiital, db) 
@@ -410,7 +413,7 @@ async def delete_hospital(hospital_id: int, db: Session = Depends(get_db)):
     return {"msg": "Hospital was successfully deleted"}
 
 # Emergency Center Endpoints
-@app.post("create_emergency_center", response_model=EmergencyCenter)
+@app.post("/create_emergency_center", response_model=EmergencyCenter)
 async def create_emergency_center(emergency_center: EmergencyCenter, db: Session = Depends(get_db)):
     emergency_center_db = create_emergency_center_in_db(emergency_center, db)
     created_emergency_center = convert_emergency_center_to_response(emergency_center_db, db) 
@@ -447,14 +450,14 @@ async def delete_emergency_center(emergency_center_id: int, db: Session = Depend
 # Emergency Dispatch Endpoints
 
 @app.post("/dispatch/{incident_id}")
-async def dispatch(incident_id: int, db: Session = Depends(get_db)):
+async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Session = Depends(get_db),):
     """
     Dispatch an ambulance to an incident.
     Scheduler handles the ambulance return to service after ETA.
     """
     incident = db.query(IncidentDB).filter(
         IncidentDB.id == incident_id,
-        IncidentDB.status == "Active"
+        IncidentDB.status == Status.ACTIVE
     ).first()
 
     if not incident:
@@ -463,7 +466,7 @@ async def dispatch(incident_id: int, db: Session = Depends(get_db)):
 
     # Get all active incidents ordered by severity
     all_active_incidents = db.query(IncidentDB).filter(
-        IncidentDB.status == "Active"
+        IncidentDB.status == Status.ACTIVE
     ).order_by(IncidentDB.severity).all()
 
     # Get available ambulances
@@ -507,33 +510,62 @@ async def dispatch(incident_id: int, db: Session = Depends(get_db)):
     closest_hospital , hospital_eta = get_eta(hospitals, incident)
 
     if best_amb and eta is not None and closest_hospital and hospital_eta is not None:
+        
+        route_to_incident = get_route_geometry(
+            best_amb.lon, best_amb.lat,
+            incident.lon, incident.lat
+        )
+
+        route_to_hospital = get_route_geometry(
+            incident.lon, incident.lat,
+            closest_hospital.lon, closest_hospital.lat
+        )
+        
         # Update ambulance status
-        best_amb.status = "Busy"
-        best_amb.lat = incident.lat
-        best_amb.lon = incident.lon
+        best_amb.status = Status.BUSY
+        # best_amb.lat = incident.lat
+        # best_amb.lon = incident.lon
 
         # Update incident status
-        incident.status = "Resolved"
+        incident.status = Status.ASSIGNED
         incident.assigned_unit = best_amb.id
         incident.assigned_hospital = closest_hospital.id
+        incident.route_to_incident = route_to_incident
+        incident.route_to_hospital = route_to_hospital
 
         db.commit()
         db.refresh(incident)
         db.refresh(best_amb)
 
-        scene_time = 10  # minutes spent at the incident scene
-        hospital_time = 10 # minutes spent at the hospital
+        scene_time = 5  # minutes spent at the incident scene
+        hospital_time = 5 # minutes spent at the hospital
 
         total_time = eta + scene_time + hospital_eta + hospital_time
+        
         # Schedule job to return ambulance to service
         return_time = datetime.now() + timedelta(minutes= total_time)
-
+        
+        best_amb.available_at = return_time
+        
         scheduler.add_job(
             return_ambulance_to_service,
             trigger=DateTrigger(run_date=return_time),
             args=[best_amb.id, incident.id],
             id=f"amb_{best_amb.id}_incident_{incident.id}",
             replace_existing=True
+        )
+
+        background_tasks.add_task(
+            animate_ambulance_movement,
+            best_amb,
+            incident,
+            route_to_incident,
+            route_to_hospital,
+            eta,
+            scene_time,
+            hospital_eta,
+            hospital_time,
+            db
         )
 
         logger.info(
@@ -552,6 +584,8 @@ async def dispatch(incident_id: int, db: Session = Depends(get_db)):
             "hospital_time": hospital_time,
             "total_time_minutes": total_time,
             "estimated_available_time": return_time.isoformat(),
+            "route_to_incident": route_to_incident,
+            "route_to_hospital": route_to_hospital,
             "hospital": {
                 "id": closest_hospital.id,
                 "name": closest_hospital.name,
@@ -584,11 +618,13 @@ async def dispatch_all(db: Session = Depends(get_db)):
     """
     # Get all active incidents ordered by severity
     all_active_incidents = db.query(IncidentDB).filter(
-        IncidentDB.status == "Active"
+        IncidentDB.status == Status.ACTIVE
     ).order_by(IncidentDB.severity).all()
 
     # Get all available ambulances
     available_ambulances = get_available_ambulances(db)
+
+    hospitals = db.query(HospitalDB).all()
 
     if not all_active_incidents:
         return {"msg": "No active incidents"}
@@ -608,20 +644,58 @@ async def dispatch_all(db: Session = Depends(get_db)):
             break
 
         best_amb, eta = get_eta(ambulances_copy, incident)
+        closest_hospital , hospital_eta = get_eta(hospitals, incident)
 
-        if best_amb and eta is not None:
+        if best_amb and eta is not None and closest_hospital and hospital_eta is not None:
+            
+            route_to_incident = get_route_geometry(
+                best_amb.lon, best_amb.lat,
+                incident.lon, incident.lat
+            )
+
+            route_to_hospital = get_route_geometry(
+                incident.lon, incident.lat,
+                closest_hospital.lon, closest_hospital.lat
+            )
+
             # Update statuses
-            best_amb.status = "Busy"
-            best_amb.lat = incident.lat
-            best_amb.lon = incident.lon
-            incident.status = "Resolved"
-            incident.assigned_unit = best_amb.id
+            best_amb.status = Status.BUSY
+            
+            for route in route_to_incident:
+                if not route:
+                    logger.warning(f"Batch dispatch failed: Could not get route geometry for Ambulance {best_amb.id} to Incident {incident.id}")
+                    continue
+                best_amb.lat = route[0]
+                best_amb.lon = route[1]
+                asyncio.sleep(1)  # Simulate time taken to update location
+            
+            for route in route_to_hospital:
+                if not route:
+                    logger.warning(f"Batch dispatch failed: Could not get route geometry for Ambulance {best_amb.id} to Hospital {closest_hospital.id}")
+                    continue
+                best_amb.lat = route[0]
+                best_amb.lon = route[1]
+                asyncio.sleep(1)  # Simulate time taken to update location
 
-            # Remove from available list
+            # best_amb.lat = incident.lat
+            # best_amb.lon = incident.lon
+            incident.status = Status.ASSIGNED
+            incident.assigned_unit = best_amb.id
+            incident.assigned_hospital = closest_hospital.id
+            incident.route_to_incident = route_to_incident
+            incident.route_to_hospital = route_to_hospital
+
+
             ambulances_copy.remove(best_amb)
 
             # Schedule job to return ambulance to service
-            return_time = datetime.now() + timedelta(minutes=eta)
+            scene_time = 5  # minutes spent at the incident scene
+            hospital_time = 5 # minutes spent at the hospital
+
+            total_time = eta + scene_time + hospital_eta + hospital_time
+            # Schedule job to return ambulance to service
+            return_time = datetime.now() + timedelta(minutes = total_time)
+
             scheduler.add_job(
                 return_ambulance_to_service,
                 trigger=DateTrigger(run_date=return_time),
@@ -634,6 +708,7 @@ async def dispatch_all(db: Session = Depends(get_db)):
                 "incident_id": incident.id,
                 "severity": incident.severity,
                 "ambulance_id": best_amb.id,
+                "hospital_id": closest_hospital.id,
                 "eta_minutes": eta,
                 "estimated_return_time": return_time.isoformat()
             })
@@ -664,13 +739,13 @@ async def dispatch_status(db: Session = Depends(get_db)):
     and priority queue information.
     """
     all_active_incidents = db.query(IncidentDB).filter(
-        IncidentDB.status == "Active"
+        IncidentDB.status == Status.ACTIVE
     ).order_by(IncidentDB.severity).all()
 
     available_ambulances = get_available_ambulances(db)
 
     busy_ambulances = db.query(AmbulanceDB).filter(
-        AmbulanceDB.status == "Busy"
+        AmbulanceDB.status == Status.BUSY
     ).all()
 
     return {
@@ -709,3 +784,92 @@ async def get_scheduled_jobs():
             for job in jobs
         ]
     }
+
+@app.get("/get_route/{ambulance_id}/{incident_id}")
+async def get_route(ambulance_id: int, incident_id: int, db: Session = Depends(get_db)):
+    print("Generating route for:", ambulance_id, incident_id)
+
+    ambulance = get_ambulance_by_id(ambulance_id, db)
+    incident = get_incident_by_id(incident_id, db)
+
+    if not ambulance or not incident:
+        logger.warning(f"Route retrieval failed: Ambulance {ambulance_id} or Incident {incident_id} not found")
+        raise HTTPException(status_code=404, detail="Ambulance or Incident not found")
+
+    # Debug print coordinates
+    print(f"Ambulance coords: lon={ambulance.lon}, lat={ambulance.lat}")
+    print(f"Incident coords: lon={incident.lon}, lat={incident.lat}")
+
+    geometry = get_route_geometry(
+        ambulance.lon, ambulance.lat,
+        incident.lon, incident.lat
+    )
+    
+    print("Geometry result:", geometry)
+    
+    if not geometry:
+        logger.warning(f"Route retrieval failed: Could not get route geometry for Ambulance {ambulance_id} to Incident {incident_id}")
+        raise HTTPException(status_code=500, detail="Could not retrieve route geometry")
+
+    return {
+        "ambulance_id": ambulance_id,
+        "incident_id": incident_id,
+        "route_geometry": geometry
+    }
+
+async def animate_ambulance_movement(ambulance: Ambulance, incident: Incident, route_to_incident, route_to_hospital, eta, scene_time, hospital_eta, hospital_time, db: Session = Depends(get_db)):
+    try:
+        if not ambulance or not incident:
+            return
+        total_time = eta + scene_time + hospital_eta + hospital_time
+        logger.info(f"Ambulance {ambulance.id} starting journey to incident {incident.id}")
+        
+        for i, coord in enumerate(route_to_incident):
+            if not coord or len(coord) < 2:
+                continue
+            
+            ambulance.lon = coord[0]
+            ambulance.lat = coord[1]
+            
+            db.commit()
+            db.refresh(ambulance)
+            
+            await asyncio.sleep((eta/len(route_to_incident)) * 60)
+            
+            logger.debug(f"Ambulance {ambulance.id} at position {i+1}/{len(route_to_incident)}")
+        
+        # Ambulance arrives at incident
+        logger.info(f"Ambulance {ambulance.id} arrived at incident {incident.id}")
+        
+        # Simulate scene time
+        await asyncio.sleep(scene_time * 60)
+        
+        # Move along route to hospital
+        logger.info(f"Ambulance {ambulance.id} heading to hospital")
+        
+        for i, coord in enumerate(route_to_hospital):
+            if not coord or len(coord) < 2:
+                continue
+            
+            ambulance.lon = coord[0]
+            ambulance.lat = coord[1]
+            
+            db.commit()
+            db.refresh(ambulance)
+            
+            await asyncio.sleep((hospital_eta/len(route_to_hospital)) * 60)
+            
+            logger.debug(f"Ambulance {ambulance.id} at position {i+1}/{len(route_to_hospital)} to hospital")
+        
+        # Arrived at hospital
+        logger.info(f"Ambulance {ambulance.id} arrived at hospital")
+        
+        # Simulate hospital time
+        await asyncio.sleep(hospital_time * 60)
+        logger.info(f"Ambulance {ambulance.id} completed hospital procedures")
+
+    except Exception as e:
+        logger.error(f"Error animating ambulance {ambulance.id}: {e}")
+
+
+

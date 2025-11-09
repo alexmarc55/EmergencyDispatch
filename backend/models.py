@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy import Column, Integer, String, Float, DateTime, JSON
 from datetime import datetime
 class AmbulanceDB(Base):
     __tablename__ = 'ambulances'
@@ -21,6 +21,8 @@ class IncidentDB(Base):
     lon = Column(Float)
     assigned_unit = Column(Integer, default = None)
     assigned_hospital = Column(Integer, nullable=True)
+    route_to_incident = Column(JSON, nullable=True)
+    route_to_hospital = Column(JSON, nullable=True)
 
 class HospitalDB(Base):
     __tablename__ = 'hospitals'
