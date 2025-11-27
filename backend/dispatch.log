@@ -899,3 +899,79 @@
 2025-11-09 15:07:34,550 - INFO - Scheduler has been shut down
 2025-11-09 15:07:49,537 - INFO - Scheduler started
 2025-11-09 15:07:49,612 - INFO - Scheduler has been shut down
+2025-11-12 18:00:34,469 - INFO - Scheduler started
+2025-11-12 18:01:17,274 - INFO - Scheduler has been shut down
+2025-11-13 18:31:36,104 - INFO - Scheduler started
+2025-11-13 18:33:55,877 - INFO - Hospital with ID 2 was successfully added to database.
+2025-11-13 18:34:46,675 - INFO - Incident created: id=2 severity=1 status='Active' lat=47.6531 lon=23.5719 assigned_unit=None assigned_hospital=0 route_to_incident=None route_to_hospital=None
+2025-11-13 18:35:09,342 - INFO - Ambulance with ID 2 was successfully added to database.
+2025-11-13 19:11:26,774 - INFO - Added job "return_ambulance_to_service" to job store "default"
+2025-11-13 19:11:27,468 - INFO - Ambulance 2 starting journey to incident 2
+2025-11-13 19:13:51,893 - INFO - Ambulance 2 arrived at incident 2
+2025-11-13 19:18:51,855 - INFO - Ambulance 2 heading to hospital
+2025-11-13 19:20:28,358 - INFO - Ambulance 2 arrived at hospital
+2025-11-13 19:25:26,781 - INFO - Running job "return_ambulance_to_service (trigger: date[2025-11-13 19:25:26 EET], next run at: 2025-11-13 19:25:26 EET)" (scheduled at 2025-11-13 19:25:26.774199+02:00)
+2025-11-13 19:25:26,782 - INFO - Removed job amb_2_incident_2
+2025-11-13 19:25:26,783 - ERROR - Error returning ambulance 2 to service: 'Depends' object has no attribute 'query'
+2025-11-13 19:25:26,783 - INFO - Job "return_ambulance_to_service (trigger: date[2025-11-13 19:25:26 EET], next run at: 2025-11-13 19:25:26 EET)" executed successfully
+2025-11-13 19:25:28,329 - INFO - Ambulance 2 completed hospital procedures
+2025-11-13 19:41:24,933 - INFO - Scheduler has been shut down
+2025-11-22 20:50:24,933 - INFO - Scheduler started
+2025-11-23 13:19:13,452 - INFO - Scheduler has been shut down
+2025-11-23 19:52:40,121 - INFO - Scheduler started
+2025-11-23 20:29:16,070 - INFO - Scheduler has been shut down
+2025-11-27 08:00:35,225 - INFO - Scheduler started
+2025-11-27 08:25:11,982 - INFO - Scheduler has been shut down
+2025-11-27 08:25:16,582 - INFO - Scheduler started
+2025-11-27 08:25:16,664 - INFO - Scheduler has been shut down
+2025-11-27 09:04:48,714 - INFO - Scheduler started
+2025-11-27 09:20:44,022 - INFO - Scheduler has been shut down
+2025-11-27 09:20:47,096 - INFO - Scheduler started
+2025-11-27 09:22:16,350 - INFO - Scheduler has been shut down
+2025-11-27 09:22:18,204 - INFO - Scheduler started
+2025-11-27 09:22:49,709 - INFO - Scheduler has been shut down
+2025-11-27 09:22:52,531 - INFO - Scheduler started
+2025-11-27 09:24:50,577 - INFO - Scheduler has been shut down
+2025-11-27 09:24:59,326 - INFO - Scheduler started
+2025-11-27 09:27:52,378 - INFO - Scheduler has been shut down
+2025-11-27 09:28:00,864 - INFO - Scheduler started
+2025-11-27 09:28:21,879 - INFO - Scheduler has been shut down
+2025-11-27 09:28:23,105 - INFO - Scheduler started
+2025-11-27 09:29:59,845 - INFO - Scheduler has been shut down
+2025-11-27 09:30:10,492 - INFO - Scheduler started
+2025-11-27 09:31:17,976 - INFO - Scheduler has been shut down
+2025-11-27 09:31:40,947 - INFO - Scheduler started
+2025-11-27 09:32:38,309 - INFO - Scheduler has been shut down
+2025-11-27 09:32:40,378 - INFO - Scheduler started
+2025-11-27 09:32:40,635 - INFO - Scheduler has been shut down
+2025-11-27 09:32:53,599 - INFO - Scheduler started
+2025-11-27 09:33:08,829 - INFO - Incident created: id=1 severity=2 type='Criza cardiaca' status='Active' lat=47.6598 lon=23.5822 nr_patients=1 assigned_unit=None assigned_hospital=None route_to_incident=None route_to_hospital=None started_at=None ended_at=None
+2025-11-27 09:33:21,287 - INFO - Incident created: id=2 severity=5 type='Incendiu locuinta' status='Active' lat=47.6539 lon=23.5684 nr_patients=3 assigned_unit=None assigned_hospital=None route_to_incident=None route_to_hospital=None started_at=None ended_at=None
+2025-11-27 09:33:49,607 - INFO - Incident created: id=3 severity=1 type='Lesin in public' status='Active' lat=47.6612 lon=23.5859 nr_patients=1 assigned_unit=None assigned_hospital=None route_to_incident=None route_to_hospital=None started_at=None ended_at=None
+2025-11-27 09:34:19,614 - INFO - Scheduler has been shut down
+2025-11-27 12:03:00,812 - INFO - Scheduler started
+2025-11-27 12:05:54,253 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-27 12:08:12,551 - INFO - Scheduler has been shut down
+2025-11-27 12:08:14,599 - INFO - Scheduler started
+2025-11-27 12:08:17,715 - INFO - Scheduler has been shut down
+2025-11-27 12:09:46,375 - INFO - Scheduler started
+2025-11-27 12:10:15,734 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-27 12:10:25,344 - INFO - Ambulance with ID 2 was successfully added to database.
+2025-11-27 12:11:22,941 - INFO - Incident created: id=1 severity=4 type='Accident rutier' status='Active' lat=47.6585 lon=23.5791 nr_patients=2 assigned_unit=None assigned_hospital=None route_to_incident=None route_to_hospital=None started_at=None ended_at=None
+2025-11-27 12:17:44,590 - INFO - Scheduler has been shut down
+2025-11-27 12:38:15,930 - INFO - Scheduler started
+2025-11-27 12:39:24,115 - INFO - Incident created: id=1 severity=4 type='Accident rutier' status='Active' lat=47.6585 lon=23.5791 nr_patients=2 assigned_unit=None assigned_hospital=None route_to_incident=None route_to_hospital=None started_at=None ended_at=None
+2025-11-27 12:39:50,358 - INFO - Ambulance with ID 1 was successfully added to database.
+2025-11-27 12:54:04,021 - INFO - Hospital with ID 1 was successfully added to database.
+2025-11-27 12:54:36,962 - INFO - Ambulance 1 dispatched to Incident 1 (severity 4), then to Hospital 1 (Opris). Journey: 3.5min (to incident) + 5min (scene) + 3.5min (to hospital) + 5min (at hospital) = 17.0min total. Available at 13:11:36
+2025-11-27 12:54:36,967 - INFO - Ambulance 1 starting journey to incident 1
+2025-11-27 12:58:07,669 - INFO - Ambulance 1 arrived at incident 1
+2025-11-27 13:03:07,675 - INFO - Ambulance 1 heading to hospital
+2025-11-27 13:06:38,387 - INFO - Ambulance 1 arrived at hospital
+2025-11-27 13:11:38,398 - INFO - Ambulance 1 completed hospital procedures, returning to base
+2025-11-27 13:11:38,417 - INFO - Ambulance 1 is back to base
+2025-11-27 13:14:20,180 - INFO - Scheduler has been shut down
+2025-11-27 13:14:22,088 - INFO - Scheduler started
+2025-11-27 13:15:42,446 - INFO - Scheduler has been shut down
+2025-11-27 13:15:44,463 - INFO - Scheduler started
+2025-11-27 13:15:46,637 - INFO - Scheduler has been shut down

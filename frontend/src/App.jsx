@@ -16,7 +16,6 @@ export default function App() {
     setSidebarOpen(!sidebarOpen)
   }
 
-  // Fetch data from backend
   useEffect(() => {
       fetchData()
       const interval = setInterval(fetchData, 1000) // Refresh every 1 second
