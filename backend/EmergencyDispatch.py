@@ -8,7 +8,7 @@ from ORS import *
 from GeoApify import *
 from Hospital import *
 from EmergencyCenter import *
-import math
+from LoginRequest import *
 import models
 from models import *
 from database import engine, SessionLocal
@@ -19,6 +19,7 @@ from apscheduler.triggers.date import DateTrigger
 from fastapi.middleware.cors import CORSMiddleware
 import atexit
 import asyncio
+from passlib.context import CryptContext
 
 logging.basicConfig(
     level=logging.INFO,
@@ -343,9 +344,10 @@ def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
     return user
 
 def create_user_in_db(user: User, db: Session = Depends(get_db)):
+    password_hashed = hash_password(user.password)
     db_user = UserDB(
         username=user.username,
-        password_hash=user.password_hash,
+        password=password_hashed,
         role=user.role,
         badge_number=user.badge_number
     )
@@ -359,7 +361,7 @@ def convert_user_to_response(user: User, db: Session = Depends(get_db)):
     db_user = User(
         id=user.id,
         username=user.username,
-        password_hash=user.password_hash,
+        password=user.password,
         role=user.role,
         badge_number=user.badge_number
     )
@@ -367,13 +369,25 @@ def convert_user_to_response(user: User, db: Session = Depends(get_db)):
 
 def update_user_in_db(user: User, updated_user: User, db: Session = Depends(get_db)):
     user.username = updated_user.username
-    user.password_hash = updated_user.password_hash
+    password_hashed = hash_password(updated_user.password)
+    user.password = password_hashed
     user.role = updated_user.role
     user.badge_number = updated_user.badge_number
 
     db.commit()
     db.refresh(user)
     return user
+
+# Login helper functions
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str):
+    return pwd_context.hash(password)
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
 
 # API ENDPOINTS
 
@@ -543,18 +557,18 @@ async def delete_emergency_center(emergency_center_id: int, db: Session = Depend
 
 # Patients endpoints
 
-app.post("/create_patient", response_model=Patient)
+@app.post("/create_patient", response_model=Patient)
 async def create_patient(patient: Patient, db: Session = Depends(get_db)):
     patient_db = create_patient_in_db(patient, db)
     created_patient = convert_patient_to_response(patient_db, db)
     return created_patient
 
-app.get("/patients")
+@app.get("/patients")
 async def list_patients(db: Session = Depends(get_db)):
     patients = db.query(PatientDB).all()
     return patients
 
-app.put("/update_patient")
+@app.put("/update_patient")
 async def update_patient(updated_patient: Patient, db: Session = Depends(get_db)):
     patient = get_patient_by_id(updated_patient.id, db)
     if not patient:
@@ -565,7 +579,7 @@ async def update_patient(updated_patient: Patient, db: Session = Depends(get_db)
     logger.info(f"Patient with ID {updated.id} was successfully updated!")
     return updated
 
-app.delete("/delete_patient")
+@app.delete("/delete_patient")
 async def delete_patient(patient_id: int, db: Session = Depends(get_db)):
     patient = get_patient_by_id(patient_id, db)
     if not patient:
@@ -578,18 +592,18 @@ async def delete_patient(patient_id: int, db: Session = Depends(get_db)):
     return {"msg": "Patient was successfully deleted"}
 
 # User Endpoints
-app.post("/create_user")
+@app.post("/create_user")
 async def create_user(user: User, db: Session = Depends(get_db)):
     user_db = create_user_in_db(user, db)
     created_user = convert_user_to_response(user_db, db)
     return created_user
 
-app.get("/users")
+@app.get("/users")
 async def list_users(db: Session = Depends(get_db)):
     users = db.query(UserDB).all()
     return users
 
-app.put("/update_user")
+@app.put("/update_user")
 async def update_user(updated_user: User, db: Session = Depends(get_db)):
     user = get_user_by_id(updated_user.id, db)
     if not user:
@@ -600,7 +614,7 @@ async def update_user(updated_user: User, db: Session = Depends(get_db)):
     logger.info(f"User with ID {updated.id} was successfully updated!")
     return updated
 
-app.delete("/delete_user")
+@app.delete("/delete_user")
 async def delete_user(user_id: int, db: Session = Depends(get_db)):
     user = get_user_by_id(user_id, db)
     if not user:
@@ -612,12 +626,22 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
     logger.info(f"User with ID {user_id} was successfully deleted!")
     return {"msg": "User was successfully deleted"}
 
+@app.post("/login")
+async def check_login(login_data: LoginRequest, db: Session = Depends(get_db)):
+    # Access data via login_data.username and login_data.password
+    user = db.query(UserDB).filter(UserDB.username == login_data.username).first()
 
+    if not user or not verify_password(login_data.password, user.password):
+        logger.warning(f"Login failed for user {login_data.username}")
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    
+    logger.info(f"User {login_data.username} logged in successfully")
+    return {"msg": "Login successful", "user_id": user.id, "role": user.role}
 
 # Emergency Dispatch Endpoints
 
 @app.post("/dispatch/{incident_id}")
-async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Session = Depends(get_db),):
+async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     """
     Dispatch an ambulance to an incident.
     Scheduler handles the ambulance return to service after ETA.
@@ -721,12 +745,6 @@ async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Sess
         db.commit()
         db.refresh(best_amb)
 
-        scheduler.addjob(
-            mark_incident_resolved,
-            trigger=DateTrigger(run_date=return_time),
-            args=[incident.id],
-            id=f"incident_{incident.id}_resolved",
-        )
 
         background_tasks.add_task(
             animate_ambulance_movement,
@@ -1048,7 +1066,10 @@ async def animate_ambulance_movement(ambulance: Ambulance, incident: Incident, r
         ambulance.status = Status.AVAILABLE
         db.commit()
         db.refresh(ambulance)
-
+        
+        incident.status = Status.RESOLVED
+        db.commit()
+        db.refresh(incident)
         # Go back to base
         for i, coord in enumerate(route_to_assigned_unit):
             if not coord or len(coord) < 2:
@@ -1068,11 +1089,4 @@ async def animate_ambulance_movement(ambulance: Ambulance, incident: Incident, r
     except Exception as e:
         logger.error(f"Error animating ambulance {ambulance.id}: {e}")
 
-def mark_incident_resolved(incident_id: int, db: Session = Depends(get_db)):
-    incident = get_incident_by_id(incident_id, db)
-    if incident:
-        incident.status = Status.RESOLVED
-        db.commit()
-        db.refresh(incident)
-        logger.info(f"Incident {incident_id} marked as resolved by scheduler.")
 

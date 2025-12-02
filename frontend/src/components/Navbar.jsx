@@ -15,6 +15,11 @@ export default function Navbar({ onToggleSidebar }) {
         <img src="images/logo.png" alt="Emergency Dispatch System Logo" />
         </a>
       </div>
+      <div className="account-logo">
+        <a href="/settings">
+          <img src="images/settings1.png" alt="Account Settings" />
+        </a>
+      </div>
     </nav>
   )
 }

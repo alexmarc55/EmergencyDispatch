@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useResolvedPath } from 'react-router-dom'
 
 const API_BASE_URL = 'http://localhost:8000'
 
@@ -120,5 +121,33 @@ export const get_route = async (ambulance_id, incident_id) => {
   return await response.json()
 }
 
+// Users 
+export const create_user = async (user) => {
+  const response = await api.post('/create_user', user)
+  return response.data
+}
+
+export const update_user = async (user) => {
+  const response = await api.put('/update_user', user)
+  return response.data
+}
+
+export const list_users = async () => {
+  const response = await api.get('/list_users')
+  return response.data
+}
+
+export const delete_user = async (userId) => {
+  const response = await api.delete(`/delete_user?user_id=${userId}`)
+  return response.data
+}
+
+export const check_login = async (username, password) => {
+    const response = await api.post('/login', {
+        username: username,
+        password: password
+    });
+    return response.data;
+};
 
 export default api

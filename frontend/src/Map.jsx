@@ -99,11 +99,7 @@ export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <ZoomControl position={sidebarOpen ? "bottomright" : "topleft"} />
-      <Marker position={position}>
-        <Popup>
-          Baia Mare, Romania <br /> Emergency Dispatch Center
-        </Popup>
-      </Marker>
+
 
       {/* Render incident markers */}
       {incidents.map(incident => (

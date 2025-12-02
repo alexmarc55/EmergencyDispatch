@@ -47,3 +47,18 @@
 .hamburger-btn:hover span {
   background-color: #ff6b6b;
 }
+
+.account-logo img {
+  height: 35px;
+  width: auto;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.account-logo img:hover {
+  box-shadow: 0 0 8px rgba(255, 107, 107, 0.7);
+}
+
+.account-logo {
+  margin-left: auto;
+}

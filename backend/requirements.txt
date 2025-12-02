@@ -6,3 +6,4 @@ SQLAlchemy
 pydantic
 asyncio
 apscheduler
+bcrypt==3.2.2

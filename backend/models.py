@@ -1,6 +1,7 @@
 from database import Base
 from sqlalchemy import Column, Integer, String, Float, DateTime, JSON
 from datetime import datetime
+
 class AmbulanceDB(Base):
     __tablename__ = 'ambulances'
     id = Column(Integer, primary_key = True, index = True)
@@ -48,7 +49,7 @@ class UserDB(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key= True, index = True)
     username = Column(String, unique=True, index=True)
-    password_hash = Column(String)
+    password = Column(String)
     role = Column(String)
     badge_number = Column(String, nullable=True)
 
