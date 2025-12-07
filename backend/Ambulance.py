@@ -1,7 +1,8 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, ConfigDict
+from typing import Optional, List, Any
 
 class Ambulance(BaseModel):
+  model_config = ConfigDict(from_attributes=True)
   id: Optional[int]
   status: str
   lat: float
@@ -9,4 +10,13 @@ class Ambulance(BaseModel):
   capacity: int
   default_lat: Optional[float] = None
   default_lon: Optional[float] = None
-  route_to_assigned_unit: Optional[dict] = None
+  route_to_assigned_unit: Optional[List[Any]] = None
+
+class AmbulanceUpdate(BaseModel):
+  id: int
+  status: Optional[str] = None
+  lat: Optional[float] = None
+  lon: Optional[float] = None
+  capacity: Optional[int] = None
+  default_lat: Optional[float] = None
+  default_lon: Optional[float] = None

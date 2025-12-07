@@ -1,4 +1,4 @@
-.ambulances-page {
+.emergency-centers-page {
   flex: 1;
   padding: 20px;
   background-color: #ff2929;
@@ -8,7 +8,7 @@
   min-height: 95vh;
 }
 
-.ambulances-page h1 {
+.emergency-centers-page h1 {
   color: white;
   margin-bottom: 20px;
   font-size: 50px;
@@ -21,11 +21,11 @@
   gap: 20px;
 }
 
-.ambulances-page.sidebar-open {
+.emergency-centers-page.sidebar-open {
   margin-left: 250px;
 }
 
-.ambulances-list {
+.emergency-centers-list {
   width: 100%;
   max-width: 1200px;
   display: flex;
@@ -36,7 +36,7 @@
   align-items: flex-start;
 }
 
-.ambulances-card {
+.emergency-centers-card {
   background-color: white;
   border-radius: 8px;
   padding: 15px;
@@ -45,6 +45,6 @@
   transition: transform 0.2s;
 }
 
-.ambulances-card h2 {
+.emergency-centers-card h2 {
   color: black;
 }

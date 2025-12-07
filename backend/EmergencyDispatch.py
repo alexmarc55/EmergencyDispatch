@@ -14,8 +14,6 @@ from models import *
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.date import DateTrigger
 from fastapi.middleware.cors import CORSMiddleware
 import atexit
 import asyncio
@@ -34,13 +32,6 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
-
-# Initialize APScheduler
-scheduler = BackgroundScheduler()
-scheduler.start()
-
-# Gracefully shut down scheduler
-atexit.register(lambda: scheduler.shutdown())
 
 # CORS configuration
 app.add_middleware(
@@ -96,6 +87,8 @@ def create_incident_in_db(incident: Incident, db: Session = Depends(get_db)):
 
 
 def convert_incident_to_response(db_incident: Incident, db: Session = Depends(get_db)):
+    start_str = db_incident.started_at.isoformat() if db_incident.started_at else None
+    end_str = db_incident.ended_at.isoformat() if db_incident.ended_at else None
     created = Incident(
         id=db_incident.id,
         severity=db_incident.severity,
@@ -104,25 +97,20 @@ def convert_incident_to_response(db_incident: Incident, db: Session = Depends(ge
         lon=db_incident.lon,
         nr_patients=db_incident.nr_patients,
         type=db_incident.type,
-        started_at=db_incident.started_at,
-        ended_at=db_incident.ended_at,
+        started_at=start_str,
+        ended_at=end_str,
         assigned_unit=db_incident.assigned_unit,
         assigned_hospital=db_incident.assigned_hospital
     )
     return created
 
 
-def update_incident_in_db(db_incident: Incident, updated_incident: Incident, db: Session = Depends(get_db)):
-    db_incident.severity = updated_incident.severity
-    db_incident.status = updated_incident.status
-    db_incident.lat = updated_incident.lat
-    db_incident.lon = updated_incident.lon
-    db_incident.assigned_unit = updated_incident.assigned_unit
-    db_incident.assigned_hospital = updated_incident.assigned_hospital
-    db_incident.nr_patients = updated_incident.nr_patients
-    db_incident.type = updated_incident.type
-    db_incident.started_at = updated_incident.started_at
-    db_incident.ended_at = updated_incident.ended_at
+def update_incident_in_db(db_incident: Incident, updated_incident: IncidentUpdate, db: Session = Depends(get_db)):
+    update_data = updated_incident.dict(exclude_unset=True)
+
+    for key, value in update_data.items():
+        if hasattr(db_incident, key):
+            setattr(db_incident, key, value)
 
     db.commit()
     db.refresh(db_incident)
@@ -395,6 +383,7 @@ def verify_password(plain_password, hashed_password):
 
 @app.post("/create_incident", response_model=Incident)
 async def create_incident(incident: Incident, db: Session = Depends(get_db)):
+    incident.started_at = datetime.now()
     db_incident = create_incident_in_db(incident, db)
     created_incident = convert_incident_to_response(db_incident, db)
     logger.info(f"Incident created: {created_incident}")
@@ -408,7 +397,7 @@ async def incidents(db: Session = Depends(get_db)):
 
 
 @app.put("/update_incident", response_model=Incident)
-async def update_incident(updated_incident: Incident, db: Session = Depends(get_db)):
+async def update_incident(updated_incident: IncidentUpdate, db: Session = Depends(get_db)):
     db_incident = get_incident_by_id(updated_incident.id, db)
     if not db_incident:
         logger.warning(f"Incident with ID {updated_incident.id} was not found.")
@@ -416,7 +405,7 @@ async def update_incident(updated_incident: Incident, db: Session = Depends(get_
     
     updated = update_incident_in_db(db_incident, updated_incident, db)
     logger.info(f"Incident with ID {updated.id} was successfully updated!")
-    return updated
+    return convert_incident_to_response(updated,db)
 
 
 @app.delete("/delete_incident")
@@ -642,10 +631,7 @@ async def check_login(login_data: LoginRequest, db: Session = Depends(get_db)):
 
 @app.post("/dispatch/{incident_id}")
 async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
-    """
-    Dispatch an ambulance to an incident.
-    Scheduler handles the ambulance return to service after ETA.
-    """
+
     incident = db.query(IncidentDB).filter(
         IncidentDB.id == incident_id,
         IncidentDB.status == Status.ACTIVE
@@ -779,6 +765,7 @@ async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Sess
             "estimated_available_time": return_time.isoformat(),
             "route_to_incident": route_to_incident,
             "route_to_hospital": route_to_hospital,
+            "route_to_base": route_to_assigned_unit,
             "hospital": {
                 "id": closest_hospital.id,
                 "name": closest_hospital.name,
@@ -805,10 +792,7 @@ async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Sess
 
 @app.post("/dispatch_all")
 async def dispatch_all(db: Session = Depends(get_db)):
-    """
-    Automatically dispatch all available ambulances to highest priority incidents.
-    Scheduler handles ambulance returns to service.
-    """
+
     # Get all active incidents ordered by severity
     all_active_incidents = db.query(IncidentDB).filter(
         IncidentDB.status == Status.ACTIVE
@@ -889,13 +873,6 @@ async def dispatch_all(db: Session = Depends(get_db)):
             # Schedule job to return ambulance to service
             return_time = datetime.now() + timedelta(minutes = total_time)
 
-            scheduler.add_job(
-                return_ambulance_to_service,
-                trigger=DateTrigger(run_date=return_time),
-                args=[best_amb.id, incident.id],
-                id=f"amb_{best_amb.id}_incident_{incident.id}",
-                replace_existing=True
-            )
 
             dispatched.append({
                 "incident_id": incident.id,
@@ -963,50 +940,25 @@ async def convert_address(address: str):
     return {"lat": lat, "lon": lon}
 
 
-@app.get("/scheduled_jobs")
-async def get_scheduled_jobs():
-    """Get all currently scheduled jobs for returning ambulances"""
-    jobs = scheduler.get_jobs()
-    return {
-        "scheduled_returns": len(jobs),
-        "jobs": [
-            {
-                "job_id": job.id,
-                "next_run_time": job.next_run_time.isoformat() if job.next_run_time else None
-            }
-            for job in jobs
-        ]
-    }
 
-@app.get("/get_route/{ambulance_id}/{incident_id}")
-async def get_route(ambulance_id: int, incident_id: int, db: Session = Depends(get_db)):
-    print("Generating route for:", ambulance_id, incident_id)
-
-    ambulance = get_ambulance_by_id(ambulance_id, db)
-    incident = get_incident_by_id(incident_id, db)
-
-    if not ambulance or not incident:
-        logger.warning(f"Route retrieval failed: Ambulance {ambulance_id} or Incident {incident_id} not found")
-        raise HTTPException(status_code=404, detail="Ambulance or Incident not found")
-
-    # Debug print coordinates
-    print(f"Ambulance coords: lon={ambulance.lon}, lat={ambulance.lat}")
-    print(f"Incident coords: lon={incident.lon}, lat={incident.lat}")
+@app.get("/get_route_geometry")
+async def get_route_geometry_endpoint(
+    start_lat: float, 
+    start_lon: float, 
+    end_lat: float, 
+    end_lon: float
+):
+    print(f"Generating generic route: {start_lat},{start_lon} -> {end_lat},{end_lon}")
 
     geometry = get_route_geometry(
-        ambulance.lon, ambulance.lat,
-        incident.lon, incident.lat
+        start_lon, start_lat, 
+        end_lon, end_lat
     )
     
-    print("Geometry result:", geometry)
-    
     if not geometry:
-        logger.warning(f"Route retrieval failed: Could not get route geometry for Ambulance {ambulance_id} to Incident {incident_id}")
         raise HTTPException(status_code=500, detail="Could not retrieve route geometry")
 
     return {
-        "ambulance_id": ambulance_id,
-        "incident_id": incident_id,
         "route_geometry": geometry
     }
 
@@ -1068,6 +1020,7 @@ async def animate_ambulance_movement(ambulance: Ambulance, incident: Incident, r
         db.refresh(ambulance)
         
         incident.status = Status.RESOLVED
+        incident.ended_at = datetime.now()
         db.commit()
         db.refresh(incident)
         # Go back to base

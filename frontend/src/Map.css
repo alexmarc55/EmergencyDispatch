@@ -1,28 +1,27 @@
-/* Style the popup content */
 .leaflet-popup-content-wrapper {
   background-color: #c62828 !important;
   color: white !important;
   border-radius: 8px;
 }
 
-/* Style the text inside */
 .leaflet-popup-content {
   margin: 10px;
   font-size: 1rem;
   color: white !important;
 }
 
-/* Style the close button */
 .leaflet-popup-close-button {
   color: white !important;
 }
 
-/* Style the tip (arrow pointing down) */
 .leaflet-popup-tip {
   background-color: #c62828 !important;
 }
 
-/* Hover effect on close button */
 .leaflet-popup-close-button:hover {
   color: #ffcccc !important;
+}
+
+.leaflet-control-zoom {
+  top: 60px;;
 }

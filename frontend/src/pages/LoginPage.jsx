@@ -12,7 +12,7 @@ export default function LoginPage() {
   const handleChange = (e) => {
     const { name, value } = e.target
     setLoginData(prev => ({ ...prev, [name]: value }))
-    setError('') // Clear error when user types
+    setError('')
   }
 
   const handleSubmit = async (e) => {
@@ -23,6 +23,8 @@ export default function LoginPage() {
     try {
       const response = await check_login(loginData.username, loginData.password)
         if (response.msg === 'Login successful') {
+            localStorage.setItem('user_role', response.role)
+            localStorage.setItem('user_id', response.user_id)
             navigate('/')
         } else {
             setError('Invalid username or password.')

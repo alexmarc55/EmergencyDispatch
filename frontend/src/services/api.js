@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { useResolvedPath } from 'react-router-dom'
 
 const API_BASE_URL = 'http://localhost:8000'
 
@@ -28,7 +27,9 @@ export const update_incident = async (incident) => {
 }
 
 export const delete_incident = async (incidentId) => {
-  const response = await api.delete(`/delete_incident?incident_id=${incidentId}`)
+  const response = await api.delete('/delete_incident', { 
+    params: { incident_id: incidentId } 
+  })
   return response.data
 }
 
@@ -49,7 +50,9 @@ export const update_ambulance = async (ambulance) => {
 }
 
 export const delete_ambulance = async (ambulanceId) => {
-  const response = await api.delete(`/delete_ambulance?ambulance_id=${ambulanceId}`)
+  const response = await api.delete('/delete_ambulance', {
+    params: { ambulance_id: ambulanceId }
+  })
   return response.data
 }
 
@@ -70,7 +73,10 @@ export const update_hospital = async (hospital) => {
 }
 
 export const delete_hospital = async (hospitalId) => {
-  const response = await api.delete(`/delete_hospital?hospital_id=${hospitalId}`)
+  const response = await api.delete('/delete_hospital', {
+    params: { hospital_id: hospitalId }
+  }
+  )
   return response.data
 }
 
@@ -86,7 +92,10 @@ export const update_emergency_center = async (center) => {
 }
 
 export const delete_emergency_center = async (centerId) => {
-  const response = await api.delete(`/delete_emergency_center?center_id=${centerId}`)
+  const response = await api.delete(`/delete_emergency_center`, {
+    params: { emergency_center_id: centerId }
+  }
+  )
   return response.data
 }
 
@@ -114,11 +123,16 @@ export const convert_address = async (address) => {
   return response.data
 }
 
-export const get_route = async (ambulance_id, incident_id) => {
-  const response = await api.get(`/get_route/${ambulance_id}/${incident_id}`)
-  if(!response.ok)
-    throw new Error('Failed to fetch route')
-  return await response.json()
+export const get_route_geometry = async (startLat, startLon, endLat, endLon) => {
+  const response = await api.get('/get_route_geometry', {
+    params: {
+      start_lat: startLat,
+      start_lon: startLon,
+      end_lat: endLat,
+      end_lon: endLon
+    }
+  });
+  return response.data;
 }
 
 // Users 
@@ -138,7 +152,9 @@ export const list_users = async () => {
 }
 
 export const delete_user = async (userId) => {
-  const response = await api.delete(`/delete_user?user_id=${userId}`)
+  const response = await api.delete(`/delete_user`, {
+    params: { user_id: userId }
+  })
   return response.data
 }
 
@@ -149,5 +165,28 @@ export const check_login = async (username, password) => {
     });
     return response.data;
 };
+
+// Patients
+export const create_patient = async (patient) => {
+  const response = await api.post('/create_patient', patient)
+  return response.data
+}
+
+export const get_patients = async () => {
+  const response = await api.get('/patients')
+  return response.data
+}
+
+export const update_patient = async (patient) => {
+  const response = await api.put('/update_patient', patient)
+  return response.data
+}
+
+export const delete_patient = async (patientId) => {
+  const response = await api.delete(`/delete_patient`, {
+    params: { patient_id: patientId }
+  })
+  return response.data
+}
 
 export default api

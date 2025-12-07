@@ -17,7 +17,6 @@ def convert_address_to_coordinates(address: str):
     }
     response = requests.get(url,params=params)
     data = response.json()
-    print("Geoapify response:", data)
 
     results = data.get("results", [])
     if results:
