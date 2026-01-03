@@ -3,7 +3,7 @@ from typing import Optional, List, Any
 
 class Ambulance(BaseModel):
   model_config = ConfigDict(from_attributes=True)
-  id: Optional[int]
+  id: Optional[int] = None
   status: str
   lat: float
   lon: float

@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Sidebar from '../components/Sidebar'
 import SearchBar from '../components/Searchbar'
-import './AmbulancesPage.css'
-import { delete_ambulance, get_ambulances } from '../services/api'
+import Modal from '../components/Modal'
+import './AmbulancesPage.css' // Ensure you have this CSS file (copy of IncidentsPage.css)
+import { create_ambulance, get_ambulances, update_ambulance, delete_ambulance, convert_address } from '../services/api'
+import { FaEdit, FaTrash } from 'react-icons/fa'
 
 export default function AmbulancesPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -21,35 +24,38 @@ export default function AmbulancesPage() {
     setSidebarOpen(!sidebarOpen)
   }
 
+  // 1. Initial Fetch and Auth Check
   useEffect(() => {
     get_ambulances().then(data => {
       setAmbulances(data)
       setFilteredAmbulances(data)
     })
-    if (userRole == '') {
+    if (userRole === '') {
       navigate('/login_page')
     }
-
   }, [])
 
+  // 2. Polling Interval (Exact same as IncidentsPage)
   useEffect(() => {
     fetchData()
     const interval = setInterval(fetchData, 1000) // Refresh every 1 second
     return () => clearInterval(interval)
   }, [])
-
+  
   const fetchData = async () => {
     try {
-      const ambulanceData = await get_ambulances()
-      setAmbulances(ambulanceData)
-      setFilteredAmbulances(ambulanceData)
-    } catch (error) {
-      console.error('Error fetching data:', error)
-    }
+        const data = await get_ambulances()
+        setAmbulances(data)
+        // Only update filtered if we assume no active search filtering happens during auto-refresh
+        // To be exactly like your Incidents page:
+        setFilteredAmbulances(data) 
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
   }
 
   const handleSearch = (filtered, query) => {
-    setFilteredIncidents(filtered)
+    setFilteredAmbulances(filtered)
   }
 
   const openEditModal = (ambulance) => {
@@ -85,28 +91,32 @@ export default function AmbulancesPage() {
       closeModal();
     } catch (error) {
       alert("Failed to delete ambulance: " + error.message);
+      console.log(selectedAmbulance);
     }
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      const payload =
-      {
+      const payload = {
         id: formData.id,
         status: formData.status,
-        type: formData.type,
-        nr_patients: formData.nr_patients
+        capacity: parseInt(formData.capacity),
+        lat: formData.lat,
+        lon: formData.lon,
+        default_lat: formData.default_lat,
+        default_lon: formData.default_lon
       }
-      const updated = await update_incident(payload);
+      
+      const updated = await update_ambulance(payload);
 
-      const newIncidents = incidents.map(i => i.id === updated.id ? updated : i);
-      setIncidents(newIncidents);
-      setFilteredIncidents(newIncidents);
+      const newAmbulances = ambulances.map(i => i.id === updated.id ? updated : i);
+      setAmbulances(newAmbulances);
+      setFilteredAmbulances(newAmbulances);
 
       closeModal();
     } catch (error) {
-      alert("Failed to update incident: " + error.message);
+      alert("Failed to update ambulance: " + error.message);
       console.log(formData);
     }
   };
@@ -115,8 +125,8 @@ export default function AmbulancesPage() {
     const { name, value } = e.target;
     let finalValue = value;
 
-    // Convert to integer to make Pydantic happy
-    if (name === 'nr_patients' || name === 'severity') {
+    // Adapted for Ambulance Integer fields
+    if (name === 'capacity') {
       finalValue = value === '' ? '' : parseInt(value, 10);
     }
     setFormData(prev => ({ ...prev, [name]: finalValue }));
@@ -126,7 +136,7 @@ export default function AmbulancesPage() {
     e.preventDefault();
     try {
       if (!formData.address) {
-        alert("Please enter an address");
+        alert("Please enter a base address");
         return;
       }
 
@@ -136,56 +146,169 @@ export default function AmbulancesPage() {
         alert("Could not find coordinates for this address.");
         return;
       }
-
-
-      const newIncident = {
-        severity: parseInt(formData.severity) || 1,
-        status: "Active",
-        type: formData.type || "Unknown",
-        nr_patients: parseInt(formData.nr_patients) || 1,
+      
+      const newAmbulance = {
+        status: formData.status || "Available",
+        capacity: parseInt(formData.capacity) || 1,
         lat: coords.lat,
-        lon: coords.lon
+        lon: coords.lon,
+        default_lat: coords.lat,
+        default_lon: coords.lon
       };
 
-      const created = await create_incident(newIncident);
+      const created = await create_ambulance(newAmbulance);
 
-      setIncidents([...incidents, created]);
-      setFilteredIncidents([...filteredIncidents, created]);
+      setAmbulances([...ambulances, created]);
+      setFilteredAmbulances([...filteredAmbulances, created]);
 
       closeModal();
     } catch (error) {
       console.error(error);
-      alert("Failed to create incident: " + error.message);
+      alert("Failed to create ambulance: " + error.message);
       console.log(formData);
     }
   }
+
   return (
     <div className="app-container">
       <Navbar onToggleSidebar={toggleSidebar} />
       <div className="main-content">
         <Sidebar isOpen={sidebarOpen} />
         <div className={`ambulances-page ${sidebarOpen ? 'sidebar-open' : ''}`}>
+          
+          <div className="new-incident-button-container">
+            {(userRole === 'admin' || userRole === 'operator') && (
+              <button className="new-incident-button" onClick={() => openAddModal()}>
+                New Ambulance
+              </button>
+            )}
+          </div>
+
           <div className="header">
             <h1>Ambulances</h1>
             <SearchBar
               items={ambulances}
               onSearch={handleSearch}
               placeholder="Search ambulances..."
-              searchKeys={["id", "status", "type"]}
+              searchKeys={["id", "status"]}
             />
           </div>
+
           <div className="ambulances-list">
             {filteredAmbulances.map((ambulance) => (
               <div key={ambulance.id} className="ambulances-card">
-                <h2>Ambulance {ambulance.id}</h2>
+                
+                {userRole === 'admin' && (
+                  <div className="CRUD-buttons">
+                    <button onClick={() => openEditModal(ambulance)}><FaEdit /></button>
+                    <button onClick={() => openDeleteModal(ambulance)}><FaTrash /></button>
+                  </div>
+                )}
+
+                <h2>Ambulance ID: {ambulance.id}</h2>
                 <p>Status: {ambulance.status}</p>
-                <p>Location: ({ambulance.lat}, {ambulance.lon})</p>
-                <p>Default Location: ({ambulance.default_lat}, {ambulance.default_lon})</p>
+                <p>Capacity: {ambulance.capacity} Patients</p>
+                <p>Location: ({ambulance.lat?.toFixed(4)}, {ambulance.lon?.toFixed(4)})</p>
+                <p>Base: ({ambulance.default_lat?.toFixed(4)}, {ambulance.default_lon?.toFixed(4)})</p>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* --- DELETE MODAL --- */}
+      <Modal 
+        isOpen={activeModal === 'delete'} 
+        onClose={closeModal} 
+        title="Confirm Delete"
+        actions={
+          <>
+            <button className="btn-secondary" onClick={closeModal}>Cancel</button>
+            <button className="btn-danger" onClick={handleDeleteConfirm}>Delete</button>
+          </>
+        }
+      >
+        <p>Are you sure you want to delete Ambulance #{selectedAmbulance?.id}?</p>
+        <p style={{color: 'red', fontSize: '0.9rem'}}>This action cannot be undone.</p>
+      </Modal>
+
+      {/* --- EDIT MODAL --- */}
+      <Modal 
+        isOpen={activeModal === 'edit'} 
+        onClose={closeModal} 
+        title={`Edit Ambulance #${selectedAmbulance?.id}`}
+        actions={
+          <>
+            <button className="btn-secondary" onClick={closeModal}>Cancel</button>
+            <button className="btn-primary" onClick={handleEditSubmit}>Save Changes</button>
+          </>
+        }
+      >
+        <form id="edit-form">
+          <div className="form-group">
+            <label>Status</label>
+            <select name="status" value={formData.status || ''} onChange={handleInputChange}>
+               <option value="Available">Available</option>
+               <option value="Busy">Busy</option>
+               <option value="Maintenance">Maintenance</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Capacity</label>
+            <input 
+              type="number" 
+              name="capacity" 
+              value={formData.capacity || 1} 
+              onChange={handleInputChange} 
+            />
+          </div>
+        </form>
+      </Modal>
+
+      {/* --- ADD MODAL --- */}
+      <Modal 
+        isOpen={activeModal === 'add'} 
+        onClose={closeModal} 
+        title="Create New Ambulance"
+        actions={
+          <>
+            <button className="btn-secondary" onClick={closeModal}>Cancel</button>
+            <button className="btn-primary" onClick={handleAddSubmit}>Create Ambulance</button>
+          </>
+        }
+      >
+        <form>
+          <div className="form-group">
+            <label>Base Station Address</label>
+            <input 
+              type="text" 
+              name="address" 
+              placeholder="e.g. Spitalul Judetean"
+              value={formData.address || ''} 
+              onChange={handleInputChange} 
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Initial Status</label>
+            <select name="status" value={formData.status || 'Available'} onChange={handleInputChange}>
+               <option value="Available">Available</option>
+               <option value="Maintenance">Maintenance</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Capacity</label>
+            <input 
+              type="number" 
+              name="capacity" 
+              value={formData.capacity || 1} 
+              onChange={handleInputChange} 
+            />
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }

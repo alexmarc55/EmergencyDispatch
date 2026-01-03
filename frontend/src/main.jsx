@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage.jsx'
 import PatientsPage from './pages/PatientsPage.jsx'
 import HospitalsPage from './pages/HospitalsPage.jsx'
 import EmergencyCentersPage from './pages/EmergencyCentersPage.jsx'
+import UsersPage from './pages/UsersPage.jsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -21,6 +22,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/patients" element={<PatientsPage />} />
         <Route path="/hospitals" element={<HospitalsPage />} />
         <Route path="/emergency-centers" element={<EmergencyCentersPage />} />
+        <Route path="/users" element={<UsersPage />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

@@ -81,8 +81,14 @@ export const delete_hospital = async (hospitalId) => {
 }
 
 // Emergency Center
+
+export const create_emergency_center = async (center) => {
+  const response = await api.post('/create_emergency_center', center)
+  return response.data
+}
+
 export const get_emergency_centers = async () => {
-  const response = await api.get('/emergency_center')
+  const response = await api.get('/emergency_centers')
   return response.data
 }
 
@@ -146,8 +152,8 @@ export const update_user = async (user) => {
   return response.data
 }
 
-export const list_users = async () => {
-  const response = await api.get('/list_users')
+export const get_users = async () => {
+  const response = await api.get('/users')
   return response.data
 }
 

@@ -165,11 +165,12 @@ def convert_ambulance_to_response(ambulance: Ambulance, db: Session = Depends(ge
     return db_ambulance
 
 
-def update_ambulance_in_db(ambulance: Ambulance, updated_ambulance: Ambulance, db: Session = Depends(get_db)):
-    ambulance.status = updated_ambulance.status
-    ambulance.lat = updated_ambulance.lat
-    ambulance.lon = updated_ambulance.lon
-    ambulance.capacity = updated_ambulance.capacity
+def update_ambulance_in_db(ambulance: Ambulance, updated_ambulance: AmbulanceUpdate, db: Session = Depends(get_db)):
+    update_data = updated_ambulance.dict(exclude_unset=True)
+
+    for key, value in update_data.items():
+        if hasattr(ambulance, key):
+            setattr(ambulance, key, value)
 
     db.commit()
     db.refresh(ambulance)
@@ -279,10 +280,12 @@ def convert_emergency_center_to_response(emergency_center: EmergencyCenter, db: 
     )
     return db_emergency_center
 
-def update_emergency_center_in_db(emergency_center: EmergencyCenter, updated_emergency_center: EmergencyCenter, db: Session = Depends(get_db)):
-    emergency_center.name = updated_emergency_center.name
-    emergency_center.lat = updated_emergency_center.lat
-    emergency_center.lon = updated_emergency_center.lon
+def update_emergency_center_in_db(emergency_center: EmergencyCenter, updated_emergency_center: EmergencyCenterUpdate, db: Session = Depends(get_db)):
+    update_data = updated_emergency_center.dict(exclude_unset=True)
+
+    for key, value in update_data.items():
+        if hasattr(emergency_center, key):
+            setattr(emergency_center, key, value)
 
     db.commit()
     db.refresh(emergency_center)
@@ -316,11 +319,12 @@ def convert_patient_to_response(patient: Patient, db: Session = Depends(get_db))
     )
     return db_patient
 
-def update_patient_in_db(patient: Patient, updated_patient: Patient, db: Session = Depends(get_db)):
-    patient.name = updated_patient.name
-    patient.age = updated_patient.age
-    patient.phone_number = updated_patient.phone_number
-    patient.medical_history = updated_patient.medical_history
+def update_patient_in_db(patient: Patient, updated_patient: PatientUpdate, db: Session = Depends(get_db)):
+    update_data = updated_patient.dict(exclude_unset=True)
+
+    for key, value in update_data.items():
+        if hasattr(patient, key):
+            setattr(patient, key, value)
 
     db.commit()
     db.refresh(patient)
@@ -434,7 +438,7 @@ async def list_ambulances(db: Session = Depends(get_db)):
 
 
 @app.put("/update_ambulance")
-async def update_ambulance(updated_ambulance: Ambulance, db: Session = Depends(get_db)):
+async def update_ambulance(updated_ambulance: AmbulanceUpdate, db: Session = Depends(get_db)):
     ambulance = get_ambulance_by_id(updated_ambulance.id, db)
     if not ambulance:
         logger.warning(f"Ambulance with ID {updated_ambulance.id} was not found.")
@@ -522,7 +526,7 @@ async def list_emergency_centers(db: Session = Depends(get_db)):
     return emergency_centers
 
 @app.put("/update_emergency_center")
-async def update_emergency_center(updated_emergency_center: EmergencyCenter, db: Session = Depends(get_db)):
+async def update_emergency_center(updated_emergency_center: EmergencyCenterUpdate, db: Session = Depends(get_db)):
     emergency_center = get_emergency_center_by_id(updated_emergency_center.id, db)
     if not emergency_center:
         logger.warning(f"Emergency Center with ID {updated_emergency_center.id} was not found.")

@@ -50,7 +50,6 @@ export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
               if (routeToIncident?.route_geometry) {
                 newRoutes.push({
                   id: `inc-${ambulance.id}`,
-                  // Swap [Lon, Lat] -> [Lat, Lon]
                   route: routeToIncident.route_geometry.map(c => [c[1], c[0]]), 
                   type: 'to_incident'
                 })

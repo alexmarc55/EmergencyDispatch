@@ -41,10 +41,44 @@
   border-radius: 8px;
   padding: 15px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  flex: 1;
   transition: transform 0.2s;
+  position: relative;
+  flex-grow: 1;
+  flex-basis: 300px;
+  min-width: 300px;
 }
 
 .hospitals-card h2 {
   color: black;
+  margin-top: 0;
+}
+
+.CRUD-buttons {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 10px;
+  margin: 0; 
+}
+
+.new-hospital-button-container {
+    position: absolute;
+    right: 40px;
+    top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.new-hospital-button {
+    background-color: #fcfcfc;
+    color: rgb(236, 41, 41);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }

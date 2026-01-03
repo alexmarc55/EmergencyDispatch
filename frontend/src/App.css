@@ -13,3 +13,28 @@
   width: 100%;
   position: relative;
 }
+
+.new-incident-fab {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  z-index: 1000;
+  background-color: #ff2929;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.new-incident-fab:hover {
+  background-color: #d62222;
+  transform: translateY(-2px);
+}

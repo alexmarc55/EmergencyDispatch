@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
 import Map from './Map'
+import NewIncidentModal from './components/NewIncidentModal'
 import './App.css'
 import { get_incidents, get_ambulances, get_hospitals } from './services/api'
+import { FaPlus } from 'react-icons/fa' // Import Plus Icon
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -11,6 +13,10 @@ export default function App() {
   const [ambulances, setAmbulances] = useState([])
   const [hospitals, setHospitals] = useState([])
   const [loading, setLoading] = useState(true)
+  const [newIncidentModalOpen, setNewIncidentModalOpen] = useState(false)
+
+  const rawRole = localStorage.getItem('user_role')
+  const userRole = rawRole?.toLowerCase() || ''
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen)
@@ -42,8 +48,28 @@ export default function App() {
   return (
     <div className="app-container">
       <Navbar onToggleSidebar={toggleSidebar} />
+      
       <div className="main-content">
         <Sidebar isOpen={sidebarOpen} />
+        
+        <NewIncidentModal 
+            isOpen={newIncidentModalOpen} 
+            onClose={() => setNewIncidentModalOpen(false)} 
+            onSuccess={() => {
+                fetchData();
+                setNewIncidentModalOpen(false);
+            }}
+        />
+
+        {(userRole === 'admin' || userRole === 'operator') && (
+            <button 
+                className="new-incident-fab" 
+                onClick={() => setNewIncidentModalOpen(true)}
+            >
+                <FaPlus /> New Incident
+            </button>
+        )}
+
         <Map sidebarOpen={sidebarOpen}
             incidents={incidents}
             ambulances={ambulances}
