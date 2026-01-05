@@ -22,6 +22,11 @@
   color: #ffcccc !important;
 }
 
+.ambulance-icon {
+  width: 32px;
+  height: 32px;
+}
+
 .leaflet-control-zoom {
   top: 60px;;
 }

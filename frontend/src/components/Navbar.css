@@ -62,3 +62,32 @@
 .account-logo {
   margin-left: auto;
 }
+
+.nav-btn {
+  background-color: white;
+  width: auto;
+  align-items: center;
+  gap: 0.5rem;
+  
+  color: #e90000;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  transition: background 0.2s;
+  transform: translateY(5px);
+}
+
+.nav-btn:hover {
+  background-color: #222;
+  color: white;
+}
+
+.cleanup-btn {
+  background-color: #222;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+}

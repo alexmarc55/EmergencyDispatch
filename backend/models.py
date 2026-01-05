@@ -12,6 +12,8 @@ class AmbulanceDB(Base):
     default_lat = Column(Float, default = None)
     default_lon = Column(Float, default = None)
     available_at = Column(DateTime, nullable=True)
+    driver_id = Column(Integer, nullable=True)
+    base_hospital_id = Column(Integer, nullable=True)
     route_to_assigned_unit = Column(JSON, nullable=True)
 
 class IncidentDB(Base):

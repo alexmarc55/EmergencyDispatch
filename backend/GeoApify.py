@@ -8,7 +8,7 @@ GEO_APIKEY = os.getenv("GEO_APIKEY")
 
 def convert_address_to_coordinates(address: str):
     url = "https://api.geoapify.com/v1/geocode/search"
-    address = address + ", Maramures, Romania"
+    address = address + ", Baia Mare, Maramures, Romania"
     params = {
         "text" : address,
         "format": "json",

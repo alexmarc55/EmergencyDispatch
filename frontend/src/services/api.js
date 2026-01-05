@@ -195,4 +195,9 @@ export const delete_patient = async (patientId) => {
   return response.data
 }
 
+export const handle_queue_api = async () => {
+  const response = await api.post('/cleanup_stale')
+  return response.data
+}
+
 export default api

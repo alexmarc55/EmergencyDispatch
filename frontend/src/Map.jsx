@@ -3,15 +3,31 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './Map.css'
 import { useEffect, useState } from 'react'
-import { get_route_geometry } from './services/api' // UPDATED IMPORT
+import { get_route_geometry } from './services/api'
 
-// Fix default marker icons
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-})
+
+
+const ambulanceIcon = new L.Icon({
+    iconUrl: 'public/images/ambulance_marker.png', // Ensure 'ambulance.png' is in your public/ folder
+    iconSize: [45, 45],        // Size of the icon in pixels [width, height]
+    iconAnchor: [22, 22],      // Point of the icon which will correspond to marker's location (center)
+    popupAnchor: [0, -20],     // Point from which the popup should open relative to the iconAnchor
+    className: 'ambulance-marker-icon' // Optional: for CSS styling
+});
+
+const incidentIcon = new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/564/564619.png', 
+    iconSize: [35, 35],
+    iconAnchor: [17, 35],
+    popupAnchor: [0, -35],
+});
+
+const hospitalIcon = new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/4320/4320371.png', 
+    iconSize: [35, 35],
+    iconAnchor: [17, 17],
+    popupAnchor: [0, -15],
+});
 
 export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
   const position = [47.657, 23.590] // Baia Mare, Romania
@@ -140,7 +156,10 @@ export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
 
       {/* Render Markers */}
       {incidents.map(incident => (
-        <Marker key={`incident-${incident.id}`} position={[incident.lat, incident.lon]}>
+        <Marker key={`incident-${incident.id}`} 
+        position={[incident.lat, incident.lon]}
+        icon={incidentIcon}
+        >
           <Popup>
             <strong>Incident #{incident.id}</strong><br />
             Severity: {incident.severity}<br />
@@ -150,7 +169,10 @@ export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
       ))}
 
       {ambulances.map(amb => (
-        <Marker key={`ambulance-${amb.id}`} position={[amb.lat, amb.lon]}>
+        <Marker key={`ambulance-${amb.id}`} 
+        position={[amb.lat, amb.lon]}
+        icon={ambulanceIcon}
+        >
           <Popup>
             <strong>Ambulance #{amb.id}</strong><br />
             Status: {amb.status}
@@ -159,7 +181,10 @@ export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
       ))}
 
       {hospitals.map(hospital => (
-        <Marker key={`hospital-${hospital.id}`} position={[hospital.lat, hospital.lon]}>
+        <Marker key={`hospital-${hospital.id}`}
+         position={[hospital.lat, hospital.lon]}
+         icon={hospitalIcon}
+        >
           <Popup><strong>{hospital.name}</strong></Popup>
         </Marker>
       ))}

@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar'
 import Sidebar from '../components/Sidebar'
 import SearchBar from '../components/Searchbar'
 import Modal from '../components/Modal'
-import './AmbulancesPage.css' // Ensure you have this CSS file (copy of IncidentsPage.css)
+import './AmbulancesPage.css'
 import { create_ambulance, get_ambulances, update_ambulance, delete_ambulance, convert_address } from '../services/api'
 import { FaEdit, FaTrash } from 'react-icons/fa'
 
@@ -24,7 +24,6 @@ export default function AmbulancesPage() {
     setSidebarOpen(!sidebarOpen)
   }
 
-  // 1. Initial Fetch and Auth Check
   useEffect(() => {
     get_ambulances().then(data => {
       setAmbulances(data)
@@ -35,10 +34,9 @@ export default function AmbulancesPage() {
     }
   }, [])
 
-  // 2. Polling Interval (Exact same as IncidentsPage)
   useEffect(() => {
     fetchData()
-    const interval = setInterval(fetchData, 1000) // Refresh every 1 second
+    const interval = setInterval(fetchData, 1000)
     return () => clearInterval(interval)
   }, [])
   
@@ -46,8 +44,6 @@ export default function AmbulancesPage() {
     try {
         const data = await get_ambulances()
         setAmbulances(data)
-        // Only update filtered if we assume no active search filtering happens during auto-refresh
-        // To be exactly like your Incidents page:
         setFilteredAmbulances(data) 
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -105,7 +101,10 @@ export default function AmbulancesPage() {
         lat: formData.lat,
         lon: formData.lon,
         default_lat: formData.default_lat,
-        default_lon: formData.default_lon
+        default_lon: formData.default_lon,
+        driver_id: formData.driver_id,
+        base_hospital_id: formData.base_hospital_id,
+        assigned_unit_id: formData.assigned_unit_id
       }
       
       const updated = await update_ambulance(payload);
@@ -125,7 +124,6 @@ export default function AmbulancesPage() {
     const { name, value } = e.target;
     let finalValue = value;
 
-    // Adapted for Ambulance Integer fields
     if (name === 'capacity') {
       finalValue = value === '' ? '' : parseInt(value, 10);
     }
@@ -153,7 +151,9 @@ export default function AmbulancesPage() {
         lat: coords.lat,
         lon: coords.lon,
         default_lat: coords.lat,
-        default_lon: coords.lon
+        default_lon: coords.lon,
+        driver_id: formData.driver_id || null,
+        base_hospital_id: formData.base_hospital_id || null
       };
 
       const created = await create_ambulance(newAmbulance);
@@ -210,6 +210,8 @@ export default function AmbulancesPage() {
                 <p>Capacity: {ambulance.capacity} Patients</p>
                 <p>Location: ({ambulance.lat?.toFixed(4)}, {ambulance.lon?.toFixed(4)})</p>
                 <p>Base: ({ambulance.default_lat?.toFixed(4)}, {ambulance.default_lon?.toFixed(4)})</p>
+                <p>Driver ID: {ambulance.driver_id}</p>
+                <p>Base Station ID: {ambulance.base_hospital_id}</p>
               </div>
             ))}
           </div>
@@ -260,6 +262,24 @@ export default function AmbulancesPage() {
               type="number" 
               name="capacity" 
               value={formData.capacity || 1} 
+              onChange={handleInputChange} 
+            />
+          </div>
+          <div className="form-group">
+            <label>Driver ID</label>
+            <input 
+              type="number" 
+              name="driver_id" 
+              value={formData.driver_id || null} 
+              onChange={handleInputChange} 
+            />
+          </div>
+          <div className="form-group">
+            <label>Base Station ID</label>
+            <input 
+              type="number" 
+              name="base_hospital_id" 
+              value={formData.base_hospital_id || null} 
               onChange={handleInputChange} 
             />
           </div>

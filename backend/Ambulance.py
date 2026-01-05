@@ -10,6 +10,9 @@ class Ambulance(BaseModel):
   capacity: int
   default_lat: Optional[float] = None
   default_lon: Optional[float] = None
+  driver_id: Optional[int] = None
+  base_hospital_id: Optional[int] = None
+  available_at: Optional[str] = None
   route_to_assigned_unit: Optional[List[Any]] = None
 
 class AmbulanceUpdate(BaseModel):
@@ -20,3 +23,6 @@ class AmbulanceUpdate(BaseModel):
   capacity: Optional[int] = None
   default_lat: Optional[float] = None
   default_lon: Optional[float] = None
+  driver_id: Optional[int] = None
+  available_at: Optional[str] = None
+  base_hospital_id: Optional[int] = None
