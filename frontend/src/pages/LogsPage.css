@@ -1,0 +1,30 @@
+.logs-page {
+  flex: 1;
+  padding: 20px;
+  background-color: #f7f7f7;
+  min-height: 95vh;
+  color: #080707;
+}
+
+.terminal-container {
+  background: #000;
+  border: 1px solid #333;
+  padding: 15px;
+  height: 70vh;
+  overflow-y: auto;
+  border-radius: 5px;
+  box-shadow: inset 0 0 10px #000;
+}
+
+.log-line {
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  display: flex;
+  gap: 15px;
+  background-color: white;
+}
+
+.line-number { color: #59e4ee; user-select: none; min-width: 30px; }
+.log-line.warn { color: #ffcc00; background: rgba(255, 204, 0, 0.1); }
+.log-line.err { color: #961818; background: rgba(255, 68, 68, 0.1); font-weight: bold; }
+.log-line { color: #72bfc1; background: rgba(255, 68, 68, 0.1); font-weight: bold; }

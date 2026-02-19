@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { dispatch_ambulance, handle_queue_api } from '../services/api'
-import Modal from './Modal' // Reuse your existing Modal component
+import { dispatch_ambulance, handle_queue_api, get_ambulances, update_ambulance } from '../services/api'
+import Modal from './Modal'
 import './Navbar.css'
 
 export default function Navbar({ onToggleSidebar }) {
   const navigate = useNavigate()
   const [isRedispatchOpen, setIsRedispatchOpen] = useState(false)
   const [redispatchId, setRedispatchId] = useState('')
+  const [isStatusOpen, setIsStatusOpen] = useState(false)
+  const [newStatus, setNewStatus] = useState('')
   const [loading, setLoading] = useState(false)
 
   const rawRole = localStorage.getItem('user_role')
@@ -40,6 +42,36 @@ export default function Navbar({ onToggleSidebar }) {
     }
   }
 
+const handleStatusUpdate = async (e) => {
+  if (e) e.preventDefault();
+  setLoading(true);
+
+  try {
+    const ambulancesResponse = await get_ambulances();
+    const ambulance = ambulancesResponse.find(amb => amb.driver_id === parseInt(localStorage.getItem('user_id')));
+
+    if (!ambulance) {
+      alert("No ambulance found for this driver.");
+      return;
+    }
+
+    const payload = {
+      id: ambulance.id,
+      status: newStatus
+    };
+
+    const response = await update_ambulance(payload);
+
+    alert("Status updated to: " + response.status);
+    setIsStatusOpen(false);
+  } catch (error) {
+    alert("Status update failed: " + error.message);
+    console.log(payload);
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
     <>
       <nav className="navbar">
@@ -69,8 +101,13 @@ export default function Navbar({ onToggleSidebar }) {
               )}
             </div>
           )}
+          {userRole === 'driver' && (
+            <button className="nav-btn driver-btn" onClick={() => setIsStatusOpen(true)}>
+              Ambulance Status
+            </button>
+          )}
           </div>
-                  </div>
+        </div>
 
           <div className="account-logo">
             <a href="/settings"><img src="images/settings1.png" alt="Settings" /></a>
@@ -109,6 +146,33 @@ export default function Navbar({ onToggleSidebar }) {
           </div>
         </form>
       </Modal>
+
+      {/* --- STATUS MODAL --- */}
+      <Modal 
+        isOpen={isStatusOpen} 
+        onClose={() => setIsStatusOpen(false)} 
+        title="Update Ambulance Status"
+        actions={
+          <>
+            <button className="btn-secondary" onClick={() => setIsStatusOpen(false)}>Cancel</button>
+            <button className="btn-primary" onClick={handleStatusUpdate} disabled={loading}>
+              {loading ? "Updating..." : "Update Status"}
+            </button>
+          </>
+        }
+      >
+        <form onSubmit={handleStatusUpdate}>
+          <div className="form-group">
+            <label>Enter New Status</label>
+            <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
+              <option value="Available">Available</option>
+              <option value="Busy">Busy</option>
+              <option value="Unavailable">Unavailable</option>
+            </select>
+          </div>
+        </form>
+      </Modal>
+
     </>
   )
 }

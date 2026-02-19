@@ -1,5 +1,6 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, Float, DateTime, JSON
+from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, ForeignKey
+from sqlalchemy.orm import relationship
 from datetime import datetime
 
 class AmbulanceDB(Base):
@@ -12,8 +13,8 @@ class AmbulanceDB(Base):
     default_lat = Column(Float, default = None)
     default_lon = Column(Float, default = None)
     available_at = Column(DateTime, nullable=True)
-    driver_id = Column(Integer, nullable=True)
-    base_hospital_id = Column(Integer, nullable=True)
+    driver_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    base_hospital_id = Column(Integer, ForeignKey("hospitals.id"), nullable=True)
     route_to_assigned_unit = Column(JSON, nullable=True)
 
 class IncidentDB(Base):
@@ -25,8 +26,9 @@ class IncidentDB(Base):
     lat = Column(Float)
     lon = Column(Float)
     nr_patients = Column(Integer)
-    assigned_unit = Column(Integer, default = None)
-    assigned_hospital = Column(Integer, nullable=True)
+    assigned_unit = Column(Integer, ForeignKey("ambulances.id"), nullable=True)
+    assigned_hospital = Column(Integer, ForeignKey("hospitals.id"), nullable=True)
+    patient_ids = Column(JSON, nullable=True)
     route_to_incident = Column(JSON, nullable=True)
     route_to_hospital = Column(JSON, nullable=True)
     started_at = Column(DateTime, nullable=True)

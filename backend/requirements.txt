@@ -8,3 +8,4 @@ asyncio
 apscheduler
 bcrypt==3.2.2
 react-icons
+react-toastify

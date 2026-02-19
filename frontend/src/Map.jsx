@@ -2,17 +2,18 @@ import { MapContainer, TileLayer, Marker, Popup, ZoomControl, Polyline } from 'r
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './Map.css'
+import SmoothMarker from './components/SmoothMarker'
 import { useEffect, useState } from 'react'
-import { get_route_geometry } from './services/api'
+import { useMemo } from 'react'
 
 
 
 const ambulanceIcon = new L.Icon({
-    iconUrl: 'public/images/ambulance_marker.png', // Ensure 'ambulance.png' is in your public/ folder
-    iconSize: [45, 45],        // Size of the icon in pixels [width, height]
-    iconAnchor: [22, 22],      // Point of the icon which will correspond to marker's location (center)
-    popupAnchor: [0, -20],     // Point from which the popup should open relative to the iconAnchor
-    className: 'ambulance-marker-icon' // Optional: for CSS styling
+    iconUrl: 'public/images/ambulance_marker.png',
+    iconSize: [45, 45],
+    iconAnchor: [22, 22],
+    popupAnchor: [0, -20],
+    className: 'ambulance-marker-icon'
 });
 
 const incidentIcon = new L.Icon({
@@ -30,115 +31,93 @@ const hospitalIcon = new L.Icon({
 });
 
 export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
-  const position = [47.657, 23.590] // Baia Mare, Romania
-  const [routes, setRoutes] = useState([])
-  const [retryCount, setRetryCount] = useState(0)
-  const MAX_RETRIES = 5
+  const position = [47.657, 23.590]
 
-  useEffect(() => {
-    if (retryCount >= MAX_RETRIES) {
-      console.log('Max retry attempts reached. Stopping route fetching.')
-      return
+  const getProgressiveRoute = (fullRoute, currentLat, currentLon) => {
+
+    if(!fullRoute || fullRoute.length === 0) return [];
+
+    const leafletRoute = fullRoute.map(c => [c[1], c[0]]); // Convert to [lat, lon]
+    
+    // We find the closest point to current location, so we can slice the route
+    let closestIndex = 0;
+    let minDistance = Infinity;
+
+    for (let i = 0; i < leafletRoute.length; i++) {
+      const dist = Math.sqrt(
+        Math.pow(leafletRoute[i][0] - currentLat, 2) +
+        Math.pow(leafletRoute[i][1] - currentLon, 2)
+      );
+
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestIndex = i;
+      }
     }
+    return leafletRoute.slice(closestIndex);
+  }
 
-    const fetchRoutes = async () => {
-      const newRoutes = []
-      let hasError = false
+  const activeRoutes = useMemo(() => {
+    const lines = [];
 
-      // Loop through all busy ambulances to draw their paths
-      for (const ambulance of ambulances) {
-        if (ambulance.status === "Busy") {
+    incidents.forEach(incident => {
+      const assignedAmb = ambulances.find(a => a.id === incident.assigned_unit);
+      
+      if (assignedAmb && incident.status === "Assigned") {
+        const distanceToIncident = Math.sqrt(
+          Math.pow(assignedAmb.lat - incident.lat, 2) +
+          Math.pow(assignedAmb.lon - incident.lon, 2)
+        );
+
+        const hasArrivedAtIncident = distanceToIncident < 0.001; // 100 meters
+
+        if (incident.route_to_incident && !hasArrivedAtIncident) {
+          const remainingToInc = getProgressiveRoute(
+            incident.route_to_incident, 
+            assignedAmb.lat, 
+            assignedAmb.lon
+          );
           
-          // 1. Find the Incident assigned to this ambulance
-          const assignedIncident = incidents.find(
-            inc => inc.assigned_unit === ambulance.id && inc.status === "Assigned"
-          )
-
-          if (assignedIncident) {
-            try {
-              // --- SEGMENT 1: Ambulance -> Incident (RED) ---
-              // We calculate route from Ambulance Current Location to Incident Location
-              const routeToIncident = await get_route_geometry(
-                ambulance.lat, ambulance.lon,
-                assignedIncident.lat, assignedIncident.lon
-              );
-
-              if (routeToIncident?.route_geometry) {
-                newRoutes.push({
-                  id: `inc-${ambulance.id}`,
-                  route: routeToIncident.route_geometry.map(c => [c[1], c[0]]), 
-                  type: 'to_incident'
-                })
-              }
-
-              // 2. Find the Hospital assigned to this incident
-              const assignedHospital = hospitals.find(
-                h => h.id === assignedIncident.assigned_hospital
-              );
-
-              if (assignedHospital) {
-                // --- SEGMENT 2: Incident -> Hospital (BLUE) ---
-                const routeToHospital = await get_route_geometry(
-                  assignedIncident.lat, assignedIncident.lon,
-                  assignedHospital.lat, assignedHospital.lon
-                );
-
-                if (routeToHospital?.route_geometry) {
-                  newRoutes.push({
-                    id: `hos-${ambulance.id}`,
-                    route: routeToHospital.route_geometry.map(c => [c[1], c[0]]),
-                    type: 'to_hospital'
-                  })
-                }
-                // --- SEGMENT 3: Hospital -> Base (GREEN) ---
-                const baseLat = ambulance.default_lat || ambulance.lat;
-                const baseLon = ambulance.default_lon || ambulance.lon;
-
-                const routeToBase = await get_route_geometry(
-                  assignedHospital.lat, assignedHospital.lon,
-                  baseLat, baseLon
-                );
-
-                if (routeToBase?.route_geometry) {
-                  newRoutes.push({
-                    id: `base-${ambulance.id}`,
-                    route: routeToBase.route_geometry.map(c => [c[1], c[0]]),
-                    type: 'to_base'
-                  })
-                }
-              }
-
-            } catch (error) {
-              console.error(`Error fetching routes for ambulance ${ambulance.id}:`, error)
-              hasError = true
-            }
+          if (remainingToInc.length > 2) {
+            lines.push({
+              id: `inc-${incident.id}`,
+              positions: remainingToInc,
+              color: '#ff2222',
+              weight: 5,
+              opacity: 0.7
+            });
           }
         }
+
+        // 2. Logic for Route to Hospital (Blue Line)
+        if (incident.route_to_hospital && hasArrivedAtIncident) {
+          
+          const distToIncidentStart = incident.route_to_incident?.length > 0 ? 
+            Math.sqrt(Math.pow(assignedAmb.lat - incident.lat, 2) + Math.pow(assignedAmb.lon - incident.lon, 2)) 
+            : 0;
+
+          let hospitalPath;
+          if (distToIncidentStart > 0.001) { 
+             // Too far from incident, keep full blue line
+             hospitalPath = incident.route_to_hospital.map(c => [c[1], c[0]]);
+          } else {
+             // Close to or past incident, start shortening the blue line
+             hospitalPath = getProgressiveRoute(incident.route_to_hospital, assignedAmb.lat, assignedAmb.lon);
+          }
+
+          lines.push({
+            id: `hos-${incident.id}`,
+            positions: hospitalPath,
+            color: '#2244ff',
+            weight: 5,
+            opacity: 0.7
+          });
+        }
       }
+    });
 
-      if (hasError) {
-        setRetryCount(prev => prev + 1)
-      } else {
-        setRoutes(newRoutes)
-        setRetryCount(MAX_RETRIES)
-      }
-    }
-
-    fetchRoutes()
-  }, [ambulances, incidents, hospitals, retryCount])
-
-  const getRouteStyle = (type) => {
-    switch (type) {
-      case 'to_incident':
-        return { color: '#ff2222', weight: 5, opacity: 0.8, dashArray: null }; // Red
-      case 'to_hospital':
-        return { color: '#2244ff', weight: 5, opacity: 0.8, dashArray: null }; // Blue
-      case 'to_base':
-        return { color: '#22aa44', weight: 4, opacity: 0.6, dashArray: '10, 10' }; // Green Dashed
-      default:
-        return { color: 'gray', weight: 3 };
-    }
-  }
+    return lines;
+  }, [incidents, ambulances]);
 
   return (
     <MapContainer
@@ -168,17 +147,15 @@ export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
         </Marker>
       ))}
 
-      {ambulances.map(amb => (
-        <Marker key={`ambulance-${amb.id}`} 
-        position={[amb.lat, amb.lon]}
-        icon={ambulanceIcon}
-        >
-          <Popup>
-            <strong>Ambulance #{amb.id}</strong><br />
-            Status: {amb.status}
-          </Popup>
-        </Marker>
-      ))}
+{ambulances.map(amb => (
+  <SmoothMarker 
+    key={`amb-${amb.id}`} 
+    position={[amb.lat, amb.lon]} 
+    icon={ambulanceIcon}
+  >
+    <Popup><strong>Ambulance #{amb.id}</strong><br />Status: {amb.status}</Popup>
+  </SmoothMarker>
+))}
 
       {hospitals.map(hospital => (
         <Marker key={`hospital-${hospital.id}`}
@@ -189,21 +166,15 @@ export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
         </Marker>
       ))}
 
-      {/* Render Routes */}
-      {routes.map((routeData, index) => {
-        const style = getRouteStyle(routeData.type);
-        return (
-          <Polyline
-            key={`route-${routeData.id}-${index}`}
-            positions={routeData.route}
-            color={style.color}
-            weight={style.weight}
-            opacity={style.opacity}
-            dashArray={style.dashArray}
-          />
-        )
-      })}
-
+      {activeRoutes.map(route => (
+        <Polyline
+          key={route.id}
+          positions={route.positions}
+          color={route.color}
+          weight={route.weight}
+          opacity={route.opacity}
+        />
+      ))}
     </MapContainer>
   )
 }

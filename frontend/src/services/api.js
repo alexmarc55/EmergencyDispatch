@@ -200,4 +200,9 @@ export const handle_queue_api = async () => {
   return response.data
 }
 
+export const get_logs = async () => {
+  const response = await api.get('/logs')
+  return response.data.logs
+}
+
 export default api

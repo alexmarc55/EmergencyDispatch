@@ -264,6 +264,7 @@ export default function UsersPage() {
             <select name="role" value={formData.role || 'operator'} onChange={handleInputChange}>
                 <option value="operator">Operator</option>
                 <option value="admin">Admin</option>
+                <option value="driver">Driver</option>
             </select>
           </div>
 
@@ -319,6 +320,7 @@ export default function UsersPage() {
             <select name="role" value={formData.role || 'operator'} onChange={handleInputChange}>
                 <option value="operator">Operator</option>
                 <option value="admin">Admin</option>
+                <option value="driver">Driver</option>
             </select>
           </div>
 

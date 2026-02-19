@@ -177,7 +177,7 @@ def convert_ambulance_to_response(ambulance: Ambulance, db: Session = Depends(ge
         default_lat=ambulance.default_lat,
         default_lon=ambulance.default_lon,
         driver_id=ambulance.driver_id,
-        available_at=ambulance.available_at,
+        available_at=ambulance.available_at.isoformat() if ambulance.available_at else None,
         base_hospital_id=ambulance.base_hospital_id
     )
     return db_ambulance
@@ -610,7 +610,6 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.post("/login")
 async def check_login(login_data: LoginRequest, db: Session = Depends(get_db)):
-    # Access data via login_data.username and login_data.password
     user = db.query(UserDB).filter(UserDB.username == login_data.username).first()
 
     if not user or not verify_password(login_data.password, user.password):
@@ -931,12 +930,16 @@ async def animate_ambulance_movement(
     # New session for long-running task
     db = SessionLocal()
     try:
-        ambulance = db.query(AmbulanceDB).filter(AmbulanceDB.id == ambulance_id).first()
-        incident = db.query(IncidentDB).filter(IncidentDB.id == incident_id).first()
+        ambulance = get_ambulance_by_id(ambulance_id, db)
+        incident = get_incident_by_id(incident_id, db)
 
         if not ambulance or not incident:
             return
-
+        
+        # Force fresh, two db session editing same table
+        db.refresh(ambulance)
+        db.refresh(incident)
+        
         total_time = eta + scene_time + hospital_eta + hospital_time
         logger.info(f"Ambulance {ambulance.id} starting journey to incident {incident.id}")
         
@@ -944,7 +947,14 @@ async def animate_ambulance_movement(
             if not coord or len(coord) < 2: continue
             ambulance.lon = coord[0]
             ambulance.lat = coord[1]
-            db.commit() # Commit small movements
+            
+            try:
+                db.commit() # Commit small movements
+            except Exception as e:
+                logger.error(f"DB commit error for ambulance {ambulance.id}: {e}")
+                db.rollback()
+                db.refresh(ambulance)
+            
             await asyncio.sleep((eta/len(route_to_incident)) * 60)
             
         logger.info(f"Ambulance {ambulance.id} arrived at incident {incident.id}")
@@ -1041,3 +1051,13 @@ def cleanup_stale_missions(db: Session):
 async def manual_cleanup(db: Session = Depends(get_db)):
     cleanup_stale_missions(db)
     return {"msg": "System reset successful. Zombies cleared."}
+
+@app.get("/logs")
+async def get_logs():
+    try:
+        with open("dispatch.log", "r") as log_file:
+            log_lines = log_file.readlines()
+            return {"logs": log_lines[-100:]}
+    except Exception as e:
+        logger.error(f"Error retrieving logs: {e}")
+        raise HTTPException(status_code=500, detail="Could not retrieve logs")
