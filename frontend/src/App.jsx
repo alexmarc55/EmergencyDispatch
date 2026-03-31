@@ -1,35 +1,44 @@
-import { use, useEffect, useState } from 'react'
-import Navbar from './components/Navbar'
-import Sidebar from './components/Sidebar'
-import Map from './Map'
-import NewIncidentModal from './components/NewIncidentModal'
-import './App.css'
-import { get_incidents, get_ambulances, get_hospitals, get_logs } from './services/api'
-import { FaPlus } from 'react-icons/fa'
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { use, useEffect, useState } from "react";
+import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
+import Map from "./Map";
+import NewIncidentModal from "./components/NewIncidentModal";
+import "./App.css";
+import {
+  get_incidents,
+  get_ambulances,
+  get_hospitals,
+  get_logs,
+} from "./services/api";
+import { FaPlus } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import DriverMap from "./DriverMap";
 
 export default function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [incidents, setIncidents] = useState([])
-  const [ambulances, setAmbulances] = useState([])
-  const [hospitals, setHospitals] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [newIncidentModalOpen, setNewIncidentModalOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [incidents, setIncidents] = useState([]);
+  const [ambulances, setAmbulances] = useState([]);
+  const [hospitals, setHospitals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [newIncidentModalOpen, setNewIncidentModalOpen] = useState(false);
   const [lastSeenLog, setLastSeenLog] = useState("");
+  const [ambulance, setAmbulance] = useState([]);
+  const [incident, setIncident] = useState([]);
+  const [hospital, setHospital] = useState([]);
 
-  const rawRole = localStorage.getItem('user_role')
-  const userRole = rawRole?.toLowerCase() || ''
+  const rawRole = localStorage.getItem("user_role");
+  const userRole = rawRole?.toLowerCase() || "";
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen)
-  }
+    setSidebarOpen(!sidebarOpen);
+  };
 
   useEffect(() => {
-      fetchData()
-      const interval = setInterval(fetchData, 1000) // Refresh every 1 second
-      return () => clearInterval(interval)
-    }, [] )
+    fetchData();
+    const interval = setInterval(fetchData, 1000); // Refresh every 1 second
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -39,84 +48,105 @@ export default function App() {
 
         if (lastLog && lastLog !== lastSeenLog) {
           if (lastLog.includes("WARNING") || lastLog.includes("ERROR")) {
-              toast.error(lastLog);
-
+            toast.error(lastLog);
           }
-              setLastSeenLog(lastLog);
+          setLastSeenLog(lastLog);
         }
       } catch (err) {
         console.error("Log fetch failed", err);
       }
-      };
+    };
 
     const interval = setInterval(fetchLogs, 2000);
     return () => clearInterval(interval);
-    }, [lastSeenLog] );
-
-    
+  }, [lastSeenLog]);
 
   const fetchData = async () => {
     try {
-        const [incidentsData, ambulancesData, hospitalData] = await Promise.all([
-          get_incidents(),
-          get_ambulances(),
-          get_hospitals()
-        ])
-        setIncidents(incidentsData)
-        setAmbulances(ambulancesData)
-        setHospitals(hospitalData)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      } finally {
-        setLoading(false)
-      }
+      const [incidentsData, ambulancesData, hospitalData] = await Promise.all([
+        get_incidents(),
+        get_ambulances(),
+        get_hospitals(),
+      ]);
+      setIncidents(incidentsData);
+      setAmbulances(ambulancesData);
+      setHospitals(hospitalData);
+
+      const userId = parseInt(localStorage.getItem("user_id"));
+      const myAmbulance = ambulancesData.find((a) => a.driver_id === userId);
+      const myIncident = incidentsData.find(
+        (i) => i.assigned_unit === myAmbulance?.id && i.status !== "Resolved",
+      );
+      const myHospital = hospitalData.find(
+        (h) => h.id === myIncident?.assigned_hospital,
+      );
+
+      setAmbulance(myAmbulance);
+      setIncident(myIncident);
+      setHospital(myHospital);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
   return (
     <div className="app-container">
       <Navbar onToggleSidebar={toggleSidebar} />
-      
+
       <div className="main-content">
         <Sidebar isOpen={sidebarOpen} />
-        
-        <NewIncidentModal 
-            isOpen={newIncidentModalOpen} 
-            onClose={() => setNewIncidentModalOpen(false)} 
-            onSuccess={() => {
-                fetchData();
-                setNewIncidentModalOpen(false);
-            }}
+
+        <NewIncidentModal
+          isOpen={newIncidentModalOpen}
+          onClose={() => setNewIncidentModalOpen(false)}
+          onSuccess={() => {
+            fetchData();
+            setNewIncidentModalOpen(false);
+          }}
         />
 
-        {(userRole === 'admin' || userRole === 'operator') && (
-            <button 
-                className="new-incident-fab" 
-                onClick={() => setNewIncidentModalOpen(true)}
-            >
-                <FaPlus /> New Incident
-            </button>
+        {(userRole === "admin" || userRole === "operator") && (
+          <button
+            className="new-incident-fab"
+            onClick={() => setNewIncidentModalOpen(true)}
+          >
+            <FaPlus /> New Incident
+          </button>
         )}
 
-        <Map sidebarOpen={sidebarOpen}
+        {(userRole === "operator" || userRole === "admin") && (
+          <Map
+            sidebarOpen={sidebarOpen}
             incidents={incidents}
             ambulances={ambulances}
             hospitals={hospitals}
-            loading={loading}        
-        />
+            loading={loading}
+          />
+        )}
 
-        <ToastContainer 
-        position="bottom-right"
-        autoClose={10000}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
+        {userRole === "driver" && (
+          <DriverMap
+            sidebarOpen={sidebarOpen}
+            ambulance={ambulance}
+            incident={incident}
+            hospital={hospital}
+          />
+        )}
+        <ToastContainer
+          position="bottom-right"
+          autoClose={10000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
       </div>
     </div>
-  )
+  );
 }
