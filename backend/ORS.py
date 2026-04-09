@@ -51,7 +51,8 @@ def get_eta(ambulances, incident):
             best_ambulance = amb
     results.sort(key=lambda x: x[1])
     sorted_etas = results
-    return best_ambulance, round(best_eta, 1)
+    return best_ambulance, round(best_eta, 1), sorted_etas
+
 
 def get_return_eta(ambulance):
     url = "https://api.openrouteservice.org/v2/matrix/driving-car"

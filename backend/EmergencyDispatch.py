@@ -9,10 +9,12 @@ from GeoApify import *
 from Hospital import *
 from EmergencyCenter import *
 from LoginRequest import *
+from PasswordCheck import *
 import models
 from models import *
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import flag_modified
 from datetime import datetime, timedelta
 from fastapi.middleware.cors import CORSMiddleware
 import atexit
@@ -87,7 +89,7 @@ def create_incident_in_db(incident: Incident, db: Session = Depends(get_db)):
         type=incident.type,
         started_at=incident.started_at,
         ended_at=incident.ended_at,
-        assigned_unit=incident.assigned_unit,
+        assigned_units=incident.assigned_units,
         assigned_hospital=incident.assigned_hospital,
         route_to_incident=incident.route_to_incident,
         route_to_hospital=incident.route_to_hospital
@@ -111,7 +113,7 @@ def convert_incident_to_response(db_incident: Incident, db: Session = Depends(ge
         type=db_incident.type,
         started_at=start_str,
         ended_at=end_str,
-        assigned_unit=db_incident.assigned_unit,
+        assigned_units=db_incident.assigned_units,
         assigned_hospital=db_incident.assigned_hospital
     )
     return created
@@ -366,9 +368,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def hash_password(password: str):
     return pwd_context.hash(password)
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
+@app.post("/check_password")
+def verify_password(data: PasswordCheck):
+    return pwd_context.verify(data.plain_password, data.hashed_password)
 
 # API ENDPOINTS
 
@@ -612,7 +614,7 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
 async def check_login(login_data: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(UserDB).filter(UserDB.username == login_data.username).first()
 
-    if not user or not verify_password(login_data.password, user.password):
+    if not user or not verify_password(PasswordCheck(plain_password=login_data.password, hashed_password=user.password)):
         logger.warning(f"Login failed for user {login_data.username}")
         raise HTTPException(status_code=401, detail="Invalid username or password")
     
@@ -623,7 +625,7 @@ async def check_login(login_data: LoginRequest, db: Session = Depends(get_db)):
 
 @app.post("/dispatch/{incident_id}")
 async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
-
+    start_time = datetime.now()
     incident = db.query(IncidentDB).filter(
         IncidentDB.id == incident_id,
         IncidentDB.status == Status.ACTIVE
@@ -638,9 +640,8 @@ async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Sess
     ).order_by(IncidentDB.severity).all()
 
     available_ambulances = get_available_ambulances(db)
-
     hospitals = db.query(HospitalDB).all()
-    
+
     if not available_ambulances:
         logger.warning(f"No available ambulances for incident {incident_id}, incident added to queue")
         incident.status = Status.QUEUED
@@ -658,17 +659,14 @@ async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Sess
 
     if num_incidents > num_ambulances:
         priority_incidents = all_active_incidents[:num_ambulances]
-
         if incident not in priority_incidents:
             logger.info(
                 f"Incident {incident_id} (severity {incident.severity}) "
                 f"not in priority queue"
             )
-
             incident.status = Status.QUEUED
             db.commit()
             db.refresh(incident)
-
             return {
                 "msg": "Incident queued - higher priority incidents being handled first",
                 "incident_id": incident_id,
@@ -678,126 +676,181 @@ async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Sess
                 "available_ambulances": num_ambulances
             }
 
-    best_amb, eta = get_eta(available_ambulances, incident)
-    closest_hospital , hospital_eta = get_eta(hospitals, incident)
-    back_to_base_eta = get_return_eta(best_amb)
+    best_amb, best_eta, sorted_etas = get_eta(available_ambulances, incident)
+    closest_hospital, hospital_eta, _ = get_eta(hospitals, incident)
 
-    if best_amb and eta is not None and closest_hospital and hospital_eta is not None:
-        
-        route_to_incident = get_route_geometry(
-            best_amb.lon, best_amb.lat,
-            incident.lon, incident.lat
-        )
-
-        route_to_hospital = get_route_geometry(
-            incident.lon, incident.lat,
-            closest_hospital.lon, closest_hospital.lat
-        )
-
-        route_to_assigned_unit = get_route_geometry(
-            closest_hospital.lon, closest_hospital.lat,
-            best_amb.default_lon, best_amb.default_lat
-        )
-        
-        best_amb.status = Status.BUSY
-
-        incident.status = Status.ASSIGNED
-        incident.assigned_unit = best_amb.id
-        incident.assigned_hospital = closest_hospital.id
-        incident.route_to_incident = route_to_incident
-        incident.route_to_hospital = route_to_hospital
-
-        db.commit()
-        db.refresh(incident)
-        db.refresh(best_amb)
-        
-        # We simulate 5 mins for each segment
-        scene_time = 5
-        hospital_time = 5
-
-        total_time = eta + scene_time + hospital_eta + hospital_time
-        
-        return_time = datetime.now() + timedelta(minutes= total_time)
-        
-        best_amb.available_at = return_time
-        db.commit()
-        db.refresh(best_amb)
-
-
-        background_tasks.add_task(
-            animate_ambulance_movement,
-            best_amb.id,
-            incident.id,
-            route_to_incident,
-            route_to_hospital,
-            route_to_assigned_unit,
-            eta,
-            scene_time,
-            hospital_eta,
-            hospital_time,
-            back_to_base_eta,
-        )
-
-        logger.info(
-            f"Ambulance {best_amb.id} dispatched to Incident {incident.id} "
-            f"(severity {incident.severity}), then to Hospital {closest_hospital.id} ({closest_hospital.name}). "
-            f"Journey: {eta}min (to incident) + {scene_time}min (scene) + {hospital_eta}min (to hospital) "
-            f"+ {hospital_time}min (at hospital) = {total_time}min total. "
-            f"Available at {return_time.strftime('%H:%M:%S')}"
-        )
-
-        return {
-            "msg": f"Ambulance {best_amb.id} dispatched",
-            "ambulance_to_incident_eta": eta,
-            "scene_time": scene_time,
-            "incident_to_hospital_eta": hospital_eta,
-            "hospital_time": hospital_time,
-            "total_time_minutes": total_time,
-            "estimated_available_time": return_time.isoformat(),
-            "route_to_incident": route_to_incident,
-            "route_to_hospital": route_to_hospital,
-            "route_to_base": route_to_assigned_unit,
-            "hospital": {
-                "id": closest_hospital.id,
-                "name": closest_hospital.name,
-                "lat": closest_hospital.lat,
-                "lon": closest_hospital.lon
-            },
-            "incident": {
-                "id": incident.id,
-                "severity": incident.severity,
-                "status": incident.status,
-                "assigned_unit": incident.assigned_unit,
-                "assigned_hospital": incident.assigned_hospital
-            },
-            "ambulance": {
-                "id": best_amb.id,
-                "status": best_amb.status,
-                "current_location": {"lat": best_amb.lat, "lon": best_amb.lon}
-            }
-       }
-    else:
+    if not best_amb or best_eta is None or not closest_hospital or hospital_eta is None:
         logger.warning(f"Could not calculate ETA for incident {incident_id}")
         return {"msg": "Could not find suitable ambulance/hospital or calculate route"}
 
+    victims = incident.nr_patients
+
+    # Select ambulances until victim quota is met
+    selected = []
+    capacity_covered = 0
+    for amb, eta in sorted_etas:
+        if capacity_covered >= victims:
+            break
+        selected.append((amb, eta))
+        capacity_covered += amb.capacity
+
+    partially_covered = capacity_covered < victims
+    dispatched_ids = []
+    dispatch_details = []
+    routes_map = {}
+    hospital_routes_map = {}
+
+    for amb, eta in selected:
+        details = await _dispatch_single_ambulance(
+            amb, eta, incident, closest_hospital, hospital_eta, background_tasks, db
+        )
+
+        routes_map[str(amb.id)] = details["route_to_incident"]
+        hospital_routes_map[str(amb.id)] = details["route_to_hospital"]
+        dispatched_ids.append(details["ambulance_id"])
+        dispatch_details.append(details)
+
+
+        logger.info(
+            f"Ambulance {amb.id} dispatched to Incident {incident.id} "
+            f"(severity {incident.severity}), then to Hospital {closest_hospital.id} ({closest_hospital.name}). "
+            f"Journey: {eta}min (to incident) + {details['scene_time']}min (scene) + {hospital_eta}min (to hospital) "
+            f"+ {details['hospital_time']}min (at hospital) = {details['total_time']}min total. "
+            f"Available at {details['return_time'].strftime('%H:%M:%S')}"
+        )
+
+    # Only set ASSIGNED if fully covered, otherwise QUEUED with remaining victims
+    remaining_victims = 0
+    if partially_covered:
+        remaining_victims = victims - capacity_covered
+        incident.nr_patients = remaining_victims
+        incident.status = Status.QUEUED
+        incident.assigned_units = dispatched_ids
+        incident.assigned_hospital = closest_hospital.id
+        incident.route_to_incident = routes_map
+        incident.route_to_hospital = hospital_routes_map
+        db.commit()
+        db.refresh(incident)
+        logger.warning(
+            f"Incident {incident_id} partially covered: {capacity_covered}/{victims} victims assigned. "
+            f"Re-queued with {remaining_victims} remaining."
+        )
+    else:
+        incident.status = Status.ASSIGNED
+        incident.assigned_units = dispatched_ids
+        incident.assigned_hospital = closest_hospital.id
+        incident.route_to_incident = routes_map
+        incident.route_to_hospital = hospital_routes_map
+        db.commit()
+        db.refresh(incident)
+
+    end_time = datetime.now()
+    processing_time = (end_time - start_time).total_seconds()
+
+    return {
+        "msg": (
+            f"{len(selected)} ambulance(s) dispatched"
+            if not partially_covered
+            else f"{len(selected)} ambulance(s) dispatched, incident re-queued for {remaining_victims} remaining victim(s)"
+        ),
+        "ambulances_dispatched": dispatched_ids,
+        "dispatch_details": dispatch_details,
+        "coverage": {
+            "total_patients": victims,
+            "covered_this_dispatch": capacity_covered,
+            "remaining": remaining_victims,
+            "partially_covered": partially_covered,
+        },
+        "hospital": {
+            "id": closest_hospital.id,
+            "name": closest_hospital.name,
+            "lat": closest_hospital.lat,
+            "lon": closest_hospital.lon
+        },
+        "incident": {
+            "id": incident.id,
+            "severity": incident.severity,
+            "status": incident.status,
+            "assigned_units": incident.assigned_units,
+            "assigned_hospital": incident.assigned_hospital
+        },
+        "processing_time_seconds": processing_time
+    }
+
+async def _dispatch_single_ambulance(
+    amb, eta, incident, closest_hospital, hospital_eta, background_tasks=None, db=None
+):
+    back_to_base_eta = get_return_eta(amb)
+
+    route_to_incident = get_route_geometry(
+        amb.lon, amb.lat,
+        incident.lon, incident.lat
+    )
+    route_to_hospital = get_route_geometry(
+        incident.lon, incident.lat,
+        closest_hospital.lon, closest_hospital.lat
+    )
+    route_to_assigned_unit = get_route_geometry(
+        closest_hospital.lon, closest_hospital.lat,
+        amb.default_lon, amb.default_lat
+    )
+
+    scene_time = 5
+    hospital_time = 5
+    total_time = eta + scene_time + hospital_eta + hospital_time
+    return_time = datetime.now() + timedelta(minutes=total_time)
+
+    amb.status = Status.BUSY
+    amb.available_at = return_time
+
+    # Freeze all values into locals so the task captures correct values
+    _amb_id = amb.id
+    _inc_id = incident.id
+    _route_to_incident = route_to_incident
+    _route_to_hospital = route_to_hospital
+    _route_to_assigned_unit = route_to_assigned_unit
+    _eta = eta
+    _hospital_eta = hospital_eta
+    _back_to_base_eta = back_to_base_eta
+
+
+    asyncio.create_task(
+        animate_ambulance_movement(
+                _amb_id, _inc_id,
+                _route_to_incident, _route_to_hospital, _route_to_assigned_unit,
+                _eta, scene_time, hospital_eta, hospital_time, _back_to_base_eta,
+            )
+        )
+
+    return {
+        "ambulance_id": amb.id,
+        "eta_to_incident": eta,
+        "total_time_minutes": total_time,
+        "estimated_available_time": return_time.isoformat(),
+        "current_location": {"lat": amb.lat, "lon": amb.lon},
+        "scene_time": scene_time,
+        "hospital_time": hospital_time,
+        "return_time": return_time,
+        "total_time": total_time,
+        "route_to_incident": route_to_incident,
+        "route_to_hospital": route_to_hospital,
+        "route_to_assigned_unit": route_to_assigned_unit,
+    }
+
 async def process_queue_background():
-    """
-    Continuous loop that checks for queued incidents and available ambulances.
-    """
     logger.info("Starting Queue Processor...")
     while True:
         db = SessionLocal()
         try:
-            # Sort by severity ASC (1 is high) AND oldest
             next_incident = db.query(IncidentDB).filter(
                 IncidentDB.status == Status.QUEUED
             ).order_by(
-                IncidentDB.severity.asc(), 
+                IncidentDB.severity.asc(),
                 IncidentDB.started_at.asc()
             ).first()
 
             if not next_incident:
-                await asyncio.sleep(5) 
+                await asyncio.sleep(5)
                 continue
 
             available_ambulances = get_available_ambulances(db)
@@ -807,49 +860,70 @@ async def process_queue_background():
 
             hospitals = db.query(HospitalDB).all()
             if not hospitals:
-                 await asyncio.sleep(5)
-                 continue
+                await asyncio.sleep(5)
+                continue
 
             logger.info(f"Processing Queued Incident {next_incident.id} (Severity {next_incident.severity})")
 
-            best_amb, eta = get_eta(available_ambulances, next_incident)
-            closest_hospital, hospital_eta = get_eta(hospitals, next_incident)
+            best_amb, best_eta, sorted_etas = get_eta(available_ambulances, next_incident)
+            closest_hospital, hospital_eta, _ = get_eta(hospitals, next_incident)
 
-            if best_amb and eta is not None and closest_hospital and hospital_eta is not None:
-                back_to_base_eta = get_return_eta(best_amb)
-                route_to_incident = get_route_geometry(best_amb.lon, best_amb.lat, next_incident.lon, next_incident.lat)
-                route_to_hospital = get_route_geometry(next_incident.lon, next_incident.lat, closest_hospital.lon, closest_hospital.lat)
-                route_to_assigned_unit = get_route_geometry(closest_hospital.lon, closest_hospital.lat, best_amb.default_lon, best_amb.default_lat)
-
-                best_amb.status = Status.BUSY
-                next_incident.status = Status.ASSIGNED
-                next_incident.assigned_unit = best_amb.id
-                next_incident.assigned_hospital = closest_hospital.id
-                next_incident.route_to_incident = route_to_incident
-                next_incident.route_to_hospital = route_to_hospital
-                
-                # Update availability time
-                total_time = eta + 5 + hospital_eta + 5
-                best_amb.available_at = datetime.now() + timedelta(minutes=total_time)
-
-                db.commit()
-                db.refresh(next_incident) 
-                db.refresh(best_amb)
-
-                amb_id = best_amb.id
-                inc_id = next_incident.id
-
-                asyncio.create_task(
-                    animate_ambulance_movement(
-                        amb_id, inc_id, 
-                        route_to_incident, route_to_hospital, route_to_assigned_unit,
-                        eta, 5, hospital_eta, 5, back_to_base_eta
-                    )
-                )
-                logger.info(f"Queue SUCCESS: Dispatched Amb {amb_id} to Incident {inc_id}")
-            
-            else:
+            if not best_amb or best_eta is None or not closest_hospital or hospital_eta is None:
                 logger.error(f"Could not calculate route for queued incident {next_incident.id}")
+                await asyncio.sleep(2)
+                continue
+
+            victims = next_incident.nr_patients
+
+            # Select ambulances until victim quota is met
+            selected = []
+            capacity_covered = 0
+            for amb, eta in sorted_etas:
+                if capacity_covered >= victims:
+                    break
+                selected.append((amb, eta))
+                capacity_covered += amb.capacity
+
+            partially_covered = capacity_covered < victims
+            current_units = list(next_incident.assigned_units or [])
+            current_routes = dict(next_incident.route_to_incident or {})
+            current_hosp_routes = dict(next_incident.route_to_hospital or {})
+
+            for amb, eta in selected:
+                details = await _dispatch_single_ambulance(
+                    amb, eta, next_incident, closest_hospital, hospital_eta, None, db
+                )
+
+                if amb.id not in current_units:
+                    current_units.append(amb.id)
+                current_routes[str(amb.id)] = details["route_to_incident"]
+                current_hosp_routes[str(amb.id)] = details["route_to_hospital"]
+
+                logger.info(
+                    f"Queue: Ambulance {amb.id} dispatched to Incident {next_incident.id}. "
+                    f"ETA: {eta}min, Total: {details['total_time']}min."
+                )
+            next_incident.assigned_units = current_units
+            next_incident.assigned_hospital = closest_hospital.id
+            next_incident.route_to_incident = current_routes
+            next_incident.route_to_hospital = current_hosp_routes
+
+            if partially_covered:
+                remaining_victims = victims - capacity_covered
+                next_incident.nr_patients = remaining_victims
+                next_incident.status = Status.QUEUED
+                logger.warning(
+                    f"Queue: Incident {next_incident.id} partially covered: "
+                    f"{capacity_covered}/{victims} victims. Re-queued with {remaining_victims} remaining."
+                )
+            else:
+                next_incident.status = Status.ASSIGNED
+            
+            flag_modified(next_incident, "assigned_units")
+            flag_modified(next_incident, "route_to_incident")
+            flag_modified(next_incident, "route_to_hospital")
+            db.commit()
+            db.refresh(next_incident)
 
         except Exception as e:
             logger.error(f"Queue processor error: {e}")
@@ -918,85 +992,95 @@ async def get_route_geometry_endpoint(
         "route_geometry": geometry
     }
 
+
 # Function that animates ambulance movement to incident -> hospital -> back to base
 async def animate_ambulance_movement(
-    ambulance_id: int, 
-    incident_id: int, 
-    route_to_incident, 
-    route_to_hospital, 
-    route_to_assigned_unit, 
+    ambulance_id: int,
+    incident_id: int,
+    route_to_incident,
+    route_to_hospital,
+    route_to_assigned_unit,
     eta, scene_time, hospital_eta, hospital_time, back_to_base_eta
 ):
-    # New session for long-running task
     db = SessionLocal()
+    logger.info(f"CRITICAL: Animation started for ambulance {ambulance_id}")
     try:
         ambulance = get_ambulance_by_id(ambulance_id, db)
         incident = get_incident_by_id(incident_id, db)
 
         if not ambulance or not incident:
             return
-        
-        # Force fresh, two db session editing same table
+
         db.refresh(ambulance)
         db.refresh(incident)
-        
-        total_time = eta + scene_time + hospital_eta + hospital_time
+
         logger.info(f"Ambulance {ambulance.id} starting journey to incident {incident.id}")
-        
-        for i, coord in enumerate(route_to_incident):
+
+        for coord in route_to_incident:
             if not coord or len(coord) < 2: continue
             ambulance.lon = coord[0]
             ambulance.lat = coord[1]
-            
             try:
-                db.commit() # Commit small movements
+                db.commit()
             except Exception as e:
                 logger.error(f"DB commit error for ambulance {ambulance.id}: {e}")
                 db.rollback()
                 db.refresh(ambulance)
-            
-            await asyncio.sleep((eta/len(route_to_incident)) * 60)
-            
+            await asyncio.sleep((eta / len(route_to_incident)) * 60)
+
         logger.info(f"Ambulance {ambulance.id} arrived at incident {incident.id}")
         await asyncio.sleep(scene_time * 60)
-        
+
         logger.info(f"Ambulance {ambulance.id} heading to hospital")
-        for i, coord in enumerate(route_to_hospital):
+        for coord in route_to_hospital:
             if not coord or len(coord) < 2: continue
             ambulance.lon = coord[0]
             ambulance.lat = coord[1]
             db.commit()
-            await asyncio.sleep((hospital_eta/len(route_to_hospital)) * 60)
-            
+            await asyncio.sleep((hospital_eta / len(route_to_hospital)) * 60)
+
         logger.info(f"Ambulance {ambulance.id} arrived at hospital")
         await asyncio.sleep(hospital_time * 60)
-        
-        logger.info(f"Ambulance {ambulance.id} completed job. Now AVAILABLE.")
-        
+
+        # Mark this ambulance as available
         ambulance.status = Status.AVAILABLE
-        incident.status = Status.RESOLVED
-        incident.ended_at = datetime.now()
         db.commit()
-        
-        for i, coord in enumerate(route_to_assigned_unit):
-            # Check if re-dispatched
+
+        # Only resolve the incident if no other ambulance is still BUSY on it
+        db.refresh(incident)
+        other_busy = db.query(AmbulanceDB).filter(
+            AmbulanceDB.status == Status.BUSY,
+            AmbulanceDB.id != ambulance_id,
+
+            AmbulanceDB.id.in_(
+                db.query(IncidentDB.assigned_units).filter(IncidentDB.id == incident_id)
+            )
+        ).first()
+
+        if not other_busy and incident.status == Status.ASSIGNED:
+            incident.status = Status.RESOLVED
+            incident.ended_at = datetime.now()
+            db.commit()
+            logger.info(f"Incident {incident.id} resolved — all ambulances finished.")
+        else:
+            logger.info(f"Ambulance {ambulance_id} finished but incident {incident_id} still has active units.")
+
+        for coord in route_to_assigned_unit:
             db.refresh(ambulance)
             if ambulance.status == Status.BUSY:
                 logger.info(f"Ambulance {ambulance.id} was re-dispatched while returning to base!")
-                return 
-
+                return
             if not coord or len(coord) < 2: continue
             ambulance.lon = coord[0]
             ambulance.lat = coord[1]
             db.commit()
-            await asyncio.sleep((back_to_base_eta/len(route_to_assigned_unit)) * 60)
-            
+            await asyncio.sleep((back_to_base_eta / len(route_to_assigned_unit)) * 60)
+
         logger.info(f"Ambulance {ambulance.id} returned to base")
 
     except Exception as e:
         logger.error(f"Error animating ambulance {ambulance_id}: {e}")
     finally:
-        # IF animation crashes, reset ambulance
         ambulance = get_ambulance_by_id(ambulance_id, db)
         if ambulance and ambulance.status == Status.BUSY:
             ambulance.status = Status.AVAILABLE
@@ -1015,15 +1099,14 @@ def cleanup_stale_missions(db: Session):
     for incident in stale_incidents:
         logger.warning(f"Resetting interrupted Incident {incident.id}. Adding back to Queue.")
         
-        if incident.assigned_unit:
-            amb = db.query(AmbulanceDB).filter(AmbulanceDB.id == incident.assigned_unit).first()
+        if incident.assigned_units:
+            amb = db.query(AmbulanceDB).filter(AmbulanceDB.id.in_(incident.assigned_units)).first()
             if amb:
                 amb.status = Status.AVAILABLE
         
         incident.status = Status.QUEUED
-        incident.assigned_unit = None
         incident.assigned_hospital = None
-        
+        incident.assigned_units = []
         count += 1
 
     # 2. Fix any "Zombie" ambulances
@@ -1032,7 +1115,7 @@ def cleanup_stale_missions(db: Session):
     
     for amb in busy_ambulances:
         active_assignment = db.query(IncidentDB).filter(
-            IncidentDB.assigned_unit == amb.id,
+            IncidentDB.assigned_units.contains(amb.id),
             IncidentDB.status.in_([Status.ASSIGNED, Status.ACTIVE])
         ).first()
 

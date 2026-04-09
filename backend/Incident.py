@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Dict
 
 class Incident(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -10,10 +10,11 @@ class Incident(BaseModel):
     lat: float
     lon: float
     nr_patients: Optional[int] = 1
-    assigned_unit: Optional[int] = None
+    total_patients: Optional[int] = 1
+    assigned_units: Optional[List[int]] = None
     assigned_hospital: Optional[int] = None
-    route_to_incident: Optional[List[Any]] = None
-    route_to_hospital: Optional[List[Any]] = None
+    route_to_incident: Optional[Dict[int, List[Any]]] = {}
+    route_to_hospital: Optional[Dict[int, List[Any]]] = {}
     started_at: Optional[str] = None
     ended_at: Optional[str] = None
 

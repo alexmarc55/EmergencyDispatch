@@ -4,9 +4,9 @@ from typing import Optional, List, Any
 class Ambulance(BaseModel):
   model_config = ConfigDict(from_attributes=True)
   id: Optional[int] = None
-  status: str
-  lat: float
-  lon: float
+  status: Optional[str] = "Available"
+  lat: Optional[float] = None
+  lon: Optional[float] = None
   capacity: int
   default_lat: Optional[float] = None
   default_lon: Optional[float] = None

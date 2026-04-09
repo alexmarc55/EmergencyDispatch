@@ -164,6 +164,7 @@ export const delete_user = async (userId) => {
   return response.data
 }
 
+// Authentication
 export const check_login = async (username, password) => {
     const response = await api.post('/login', {
         username: username,
@@ -171,6 +172,16 @@ export const check_login = async (username, password) => {
     });
     return response.data;
 };
+
+export const check_password = async (plainPassword, hashedPassword) => {
+  const response = await api.post('/check_password', {
+    plain_password: plainPassword,
+    hashed_password: hashedPassword
+  })
+  return response.data
+}
+
+
 
 // Patients
 export const create_patient = async (patient) => {

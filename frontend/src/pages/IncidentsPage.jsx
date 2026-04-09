@@ -1,74 +1,79 @@
-import { useState, useEffect, use } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
-import Sidebar from '../components/Sidebar'
-import SearchBar from '../components/Searchbar'
-import Modal from '../components/Modal'
-import './IncidentsPage.css'
-import { create_incident, get_incidents, update_incident, delete_incident, convert_address } from '../services/api'
-import { FaEdit, FaTrash } from 'react-icons/fa'
+import { useState, useEffect, use } from "react";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
+import SearchBar from "../components/Searchbar";
+import Modal from "../components/Modal";
+import "./IncidentsPage.css";
+import {
+  create_incident,
+  get_incidents,
+  update_incident,
+  delete_incident,
+  convert_address,
+} from "../services/api";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 export default function IncidentsPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [incidents, setIncidents] = useState([])
-  const [filteredIncidents, setFilteredIncidents] = useState([])
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [incidents, setIncidents] = useState([]);
+  const [filteredIncidents, setFilteredIncidents] = useState([]);
   const [activeModal, setActiveModal] = useState(null);
   const [formData, setFormData] = useState({});
   const [selectedIncident, setSelectedIncident] = useState(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const rawRole = localStorage.getItem('user_role')
-  const userRole = rawRole?.toLowerCase() || ''
+  const rawRole = localStorage.getItem("user_role");
+  const userRole = rawRole?.toLowerCase() || "";
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen)
-  }
+    setSidebarOpen(!sidebarOpen);
+  };
 
   useEffect(() => {
-    get_incidents().then(data => {
-      setIncidents(data)
-      setFilteredIncidents(data)
-    })
-    if (userRole == '') {
-      navigate('/login_page')
+    get_incidents().then((data) => {
+      setIncidents(data);
+      setFilteredIncidents(data);
+    });
+    if (userRole == "") {
+      navigate("/login_page");
     }
-
-  }, [])
+  }, []);
 
   useEffect(() => {
-    fetchData()
-    const interval = setInterval(fetchData, 1000) // Refresh every 1 second
-    return () => clearInterval(interval)
-  }, [])
-  
+    fetchData();
+    const interval = setInterval(fetchData, 10000); // Refresh every 10 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   const fetchData = async () => {
     try {
-        const incidentsData = await get_incidents()
-        setIncidents(incidentsData)
-        setFilteredIncidents(incidentsData)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-  }
+      const incidentsData = await get_incidents();
+      setIncidents(incidentsData);
+      setFilteredIncidents(incidentsData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   const handleSearch = (filtered, query) => {
-    setFilteredIncidents(filtered)
-  }
+    setFilteredIncidents(filtered);
+  };
 
   const openEditModal = (incident) => {
     setSelectedIncident(incident);
     setFormData({ ...incident });
-    setActiveModal('edit');
+    setActiveModal("edit");
   };
 
   const openDeleteModal = (incident) => {
     setSelectedIncident(incident);
-    setActiveModal('delete');
+    setActiveModal("delete");
   };
 
   const openAddModal = () => {
     setFormData({});
-    setActiveModal('add');
+    setActiveModal("add");
   };
 
   const closeModal = () => {
@@ -81,7 +86,7 @@ export default function IncidentsPage() {
     try {
       await delete_incident(selectedIncident.id);
 
-      const updated = incidents.filter(i => i.id !== selectedIncident.id);
+      const updated = incidents.filter((i) => i.id !== selectedIncident.id);
       setIncidents(updated);
       setFilteredIncidents(updated);
 
@@ -95,17 +100,18 @@ export default function IncidentsPage() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      const payload =
-      {
+      const payload = {
         id: formData.id,
         severity: formData.severity,
         status: formData.status,
         type: formData.type,
-        nr_patients: formData.nr_patients
-      }
+        nr_patients: formData.nr_patients,
+      };
       const updated = await update_incident(payload);
 
-      const newIncidents = incidents.map(i => i.id === updated.id ? updated : i);
+      const newIncidents = incidents.map((i) =>
+        i.id === updated.id ? updated : i,
+      );
       setIncidents(newIncidents);
       setFilteredIncidents(newIncidents);
 
@@ -121,10 +127,10 @@ export default function IncidentsPage() {
     let finalValue = value;
 
     // Convert to integer to make Pydantic happy
-    if (name === 'nr_patients' || name === 'severity') {
-      finalValue = value === '' ? '' : parseInt(value, 10);
+    if (name === "nr_patients" || name === "severity") {
+      finalValue = value === "" ? "" : parseInt(value, 10);
     }
-    setFormData(prev => ({ ...prev, [name]: finalValue }));
+    setFormData((prev) => ({ ...prev, [name]: finalValue }));
   };
 
   const handleAddSubmit = async (e) => {
@@ -142,14 +148,13 @@ export default function IncidentsPage() {
         return;
       }
 
-
       const newIncident = {
         severity: parseInt(formData.severity) || 1,
         status: "Active",
         type: formData.type || "Unknown",
         nr_patients: parseInt(formData.nr_patients) || 1,
         lat: coords.lat,
-        lon: coords.lon
+        lon: coords.lon,
       };
 
       const created = await create_incident(newIncident);
@@ -163,16 +168,19 @@ export default function IncidentsPage() {
       alert("Failed to create incident: " + error.message);
       console.log(formData);
     }
-  }
+  };
   return (
     <div className="app-container">
       <Navbar onToggleSidebar={toggleSidebar} />
       <div className="main-content">
         <Sidebar isOpen={sidebarOpen} />
-        <div className={`incidents-page ${sidebarOpen ? 'sidebar-open' : ''}`}>
+        <div className={`incidents-page ${sidebarOpen ? "sidebar-open" : ""}`}>
           <div className="new-incident-button-container">
-            {(userRole === 'admin' || userRole === 'operator') && (
-              <button className="new-incident-button" onClick={() => openAddModal()}>
+            {(userRole === "admin" || userRole === "operator") && (
+              <button
+                className="new-incident-button"
+                onClick={() => openAddModal()}
+              >
                 New Incident
               </button>
             )}
@@ -189,16 +197,24 @@ export default function IncidentsPage() {
           <div className="incidents-list">
             {filteredIncidents.map((incident) => (
               <div key={incident.id} className="incidents-card">
-                {(userRole === 'admin' || (userRole === "operator" && incident.status === "Active")) && (
+                {(userRole === "admin" ||
+                  (userRole === "operator" &&
+                    incident.status === "Active")) && (
                   <div className="CRUD-buttons">
-                    <button onClick={() => openEditModal(incident)}><FaEdit /></button>
-                    <button onClick={() => openDeleteModal(incident)}><FaTrash /></button>
+                    <button onClick={() => openEditModal(incident)}>
+                      <FaEdit />
+                    </button>
+                    <button onClick={() => openDeleteModal(incident)}>
+                      <FaTrash />
+                    </button>
                   </div>
                 )}
                 <h2>Incident ID: {incident.id}</h2>
                 <p>Status: {incident.status}</p>
                 <p>Severity: {incident.severity}</p>
-                <p>Location: ({incident.lat}, {incident.lon})</p>
+                <p>
+                  Location: ({incident.lat}, {incident.lon})
+                </p>
                 <p>Started at: {incident.started_at}</p>
                 <p>Ended at: {incident.ended_at}</p>
                 <p>Type: {incident.type}</p>
@@ -210,36 +226,50 @@ export default function IncidentsPage() {
       </div>
 
       <Modal
-        isOpen={activeModal === 'delete'}
+        isOpen={activeModal === "delete"}
         onClose={closeModal}
         title="Confirm Delete"
         actions={
           <>
-            <button className="btn-secondary" onClick={closeModal}>Cancel</button>
-            <button className="btn-danger" onClick={handleDeleteConfirm}>Delete</button>
+            <button className="btn-secondary" onClick={closeModal}>
+              Cancel
+            </button>
+            <button className="btn-danger" onClick={handleDeleteConfirm}>
+              Delete
+            </button>
           </>
         }
       >
         <p>Are you sure you want to delete Incident #{selectedIncident?.id}?</p>
-        <p style={{ color: 'red', fontSize: '0.9rem' }}>This action cannot be undone.</p>
+        <p style={{ color: "red", fontSize: "0.9rem" }}>
+          This action cannot be undone.
+        </p>
       </Modal>
 
       {/* EDIT MODAL */}
       <Modal
-        isOpen={activeModal === 'edit'}
+        isOpen={activeModal === "edit"}
         onClose={closeModal}
         title={`Edit Incident #${selectedIncident?.id}`}
         actions={
           <>
-            <button className="btn-secondary" onClick={closeModal}>Cancel</button>
-            <button className="btn-primary" onClick={handleEditSubmit}>Save Changes</button>
+            <button className="btn-secondary" onClick={closeModal}>
+              Cancel
+            </button>
+            <button className="btn-primary" onClick={handleEditSubmit}>
+              Save Changes
+            </button>
           </>
         }
       >
         <form id="edit-form">
           <div className="form-group">
             <label>Severity</label>
-            <select name="severity" value={formData.severity || 1} onChange={handleInputChange}>
+            <select
+              name="severity"
+              value={formData.severity || 1}
+              onChange={handleInputChange}
+            >
               <option value={1}>1 - Critical</option>
               <option value={2}>2 - Medium</option>
               <option value={3}>3 - Low</option>
@@ -248,7 +278,11 @@ export default function IncidentsPage() {
 
           <div className="form-group">
             <label>Status</label>
-            <select name="status" value={formData.status || ''} onChange={handleInputChange}>
+            <select
+              name="status"
+              value={formData.status || ""}
+              onChange={handleInputChange}
+            >
               <option value="Active">Active</option>
               <option value="Assigned">Assigned</option>
               <option value="Resolved">Resolved</option>
@@ -260,7 +294,7 @@ export default function IncidentsPage() {
             <input
               type="text"
               name="type"
-              value={formData.type || ''}
+              value={formData.type || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -269,7 +303,7 @@ export default function IncidentsPage() {
             <input
               type="number"
               name="nr_patients"
-              value={formData.nr_patients || ''}
+              value={formData.nr_patients || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -278,13 +312,17 @@ export default function IncidentsPage() {
 
       {/* --- ADD INCIDENT MODAL --- */}
       <Modal
-        isOpen={activeModal === 'add'}
+        isOpen={activeModal === "add"}
         onClose={closeModal}
         title="Create New Incident"
         actions={
           <>
-            <button className="btn-secondary" onClick={closeModal}>Cancel</button>
-            <button className="btn-primary" onClick={handleAddSubmit}>Create Incident</button>
+            <button className="btn-secondary" onClick={closeModal}>
+              Cancel
+            </button>
+            <button className="btn-primary" onClick={handleAddSubmit}>
+              Create Incident
+            </button>
           </>
         }
       >
@@ -295,7 +333,7 @@ export default function IncidentsPage() {
               type="text"
               name="address"
               placeholder="e.g. Strada Victoriei 5"
-              value={formData.address || ''}
+              value={formData.address || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -306,14 +344,18 @@ export default function IncidentsPage() {
               type="text"
               name="type"
               placeholder="e.g. Car Accident, Heart Attack"
-              value={formData.type || ''}
+              value={formData.type || ""}
               onChange={handleInputChange}
             />
           </div>
 
           <div className="form-group">
             <label>Severity</label>
-            <select name="severity" value={formData.severity || 1} onChange={handleInputChange}>
+            <select
+              name="severity"
+              value={formData.severity || 1}
+              onChange={handleInputChange}
+            >
               <option value={1}>1 - Critical</option>
               <option value={2}>2 - Medium</option>
               <option value={3}>3 - Low</option>
@@ -332,5 +374,5 @@ export default function IncidentsPage() {
         </form>
       </Modal>
     </div>
-  )
+  );
 }

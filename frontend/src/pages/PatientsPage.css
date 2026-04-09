@@ -1,11 +1,13 @@
 .patients-page {
   flex: 1;
   padding: 20px;
-  background-color: #ff2929; /* Kept red to match your theme */
+  background-color: #ff2929;
   transition: margin-left 0.3s ease;
   display: flex;
   flex-direction: column;
   min-height: 95vh;
+  overflow-y: auto;
+  padding-top: 60px;
 }
 
 .patients-page h1 {
@@ -58,27 +60,27 @@
   right: 15px;
   display: flex;
   gap: 10px;
-  margin: 0; 
+  margin: 0;
 }
 
 .new-patient-button-container {
-    position: absolute;
-    right: 40px;
-    top: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    margin-bottom: 10px;
-    background-color: white;
+  position: absolute;
+  right: 40px;
+  top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  background-color: white;
 }
 
 .new-patient-button {
-    background-color: #fcfcfc;
-    color: rgb(236, 41, 41);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: #fcfcfc;
+  color: rgb(236, 41, 41);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
