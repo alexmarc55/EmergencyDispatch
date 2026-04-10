@@ -128,3 +128,29 @@ def get_route_geometry(start_lon, start_lat, end_lon, end_lat):
         import traceback
         traceback.print_exc()
         return None
+    
+def check_ors_health():
+    url = "https://api.openrouteservice.org/v2/directions/driving-car/geojson"
+    headers = {
+        "Authorization": ORS_API_KEY,
+        "Content-Type": "application/json"
+    }
+    
+    
+    body = {
+        "coordinates": [[23.576, 47.659], [23.577, 47.660]],
+        "radiuses": [-1, -1]
+    }
+    
+
+    try:
+        response = requests.post(url, json=body, headers=headers, timeout=5)
+        if response.status_code == 200:
+            return "Healthy"
+        elif response.status_code == 401:
+            return "Invalid API Key"
+        elif response.status_code == 429:
+            return "Rate Limited"
+        return f"Error ({response.status_code})"
+    except Exception:
+        return "Disconnected"

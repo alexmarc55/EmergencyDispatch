@@ -17,6 +17,7 @@ class Incident(BaseModel):
     route_to_hospital: Optional[Dict[int, List[Any]]] = {}
     started_at: Optional[str] = None
     ended_at: Optional[str] = None
+    processing_time_seconds: Optional[int] = None
 
 class IncidentUpdate(BaseModel):
     id: int

@@ -1,0 +1,166 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.statistics-page {
+  flex: 1;
+  padding: 40px;
+  transition: margin-left 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.statistics-page.sidebar-open {
+  margin-left: 260px;
+}
+
+.stats-grid {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chart-container {
+  width: 100%;
+  height: 500px;
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chart-controls-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.controls-group {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.filter-buttons {
+  display: flex;
+  background: #e9ecef;
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.filter-buttons button {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #6c757d;
+  transition: all 0.2s ease;
+}
+
+.filter-buttons button.active {
+  background: white;
+  color: #ff4444;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-buttons button:not(.active):hover {
+  color: #212529;
+}
+
+.refresh-btn {
+  padding: 10px 20px;
+  background-color: #212529;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 10px;
+}
+
+.section-header h3 {
+  font-size: 1.1rem;
+  color: #f3f3f3;
+  margin: 0;
+}
+
+.refresh-health-btn {
+  padding: 10px 20px;
+  background-color: #212529;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.refresh-health-btn:hover {
+  background: #007bff;
+  color: white;
+}
+
+.refresh-health-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.health-dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.health-card {
+  background: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  color: #333;
+}
+
+.status-pill {
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.status-pill.green {
+  color: #28a745;
+}
+
+.status-pill.red {
+  color: #dc3545;
+}

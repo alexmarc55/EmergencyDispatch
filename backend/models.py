@@ -34,6 +34,7 @@ class IncidentDB(Base):
     route_to_hospital = Column(JSON, nullable=True)
     started_at = Column(DateTime, nullable=True)
     ended_at = Column(DateTime, nullable=True)
+    processing_time_seconds = Column(Integer, nullable=True)
 
 class HospitalDB(Base):
     __tablename__ = 'hospitals'

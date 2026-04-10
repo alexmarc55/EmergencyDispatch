@@ -216,4 +216,10 @@ export const get_logs = async () => {
   return response.data.logs
 }
 
+export const health_check = async () => {
+  const response = await api.get('/health')
+  return response.data
+}
+
+
 export default api

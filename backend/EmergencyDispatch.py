@@ -13,6 +13,7 @@ from PasswordCheck import *
 import models
 from models import *
 from database import engine, SessionLocal
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 from datetime import datetime, timedelta
@@ -745,7 +746,7 @@ async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Sess
         db.refresh(incident)
 
     end_time = datetime.now()
-    processing_time = (end_time - start_time).total_seconds()
+    incident.processing_time_seconds = (end_time - start_time).total_seconds()
 
     return {
         "msg": (
@@ -774,7 +775,7 @@ async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Sess
             "assigned_units": incident.assigned_units,
             "assigned_hospital": incident.assigned_hospital
         },
-        "processing_time_seconds": processing_time
+        "processing_time_seconds": incident.processing_time_seconds
     }
 
 async def _dispatch_single_ambulance(
@@ -837,10 +838,14 @@ async def _dispatch_single_ambulance(
         "route_to_assigned_unit": route_to_assigned_unit,
     }
 
+LAST_QUEUE_RUN = 0
+
 async def process_queue_background():
     logger.info("Starting Queue Processor...")
+    global LAST_QUEUE_RUN
     while True:
         db = SessionLocal()
+        LAST_QUEUE_RUN = time.time()
         try:
             next_incident = db.query(IncidentDB).filter(
                 IncidentDB.status == Status.QUEUED
@@ -864,7 +869,7 @@ async def process_queue_background():
                 continue
 
             logger.info(f"Processing Queued Incident {next_incident.id} (Severity {next_incident.severity})")
-
+            start_time = datetime.now()
             best_amb, best_eta, sorted_etas = get_eta(available_ambulances, next_incident)
             closest_hospital, hospital_eta, _ = get_eta(hospitals, next_incident)
 
@@ -922,6 +927,8 @@ async def process_queue_background():
             flag_modified(next_incident, "assigned_units")
             flag_modified(next_incident, "route_to_incident")
             flag_modified(next_incident, "route_to_hospital")
+            end_time = datetime.now()
+            next_incident.processing_time_seconds = (end_time - start_time).total_seconds()
             db.commit()
             db.refresh(next_incident)
 
@@ -1144,3 +1151,32 @@ async def get_logs():
     except Exception as e:
         logger.error(f"Error retrieving logs: {e}")
         raise HTTPException(status_code=500, detail="Could not retrieve logs")
+    
+@app.get("/health")
+async def health(db: Session = Depends(get_db)):
+    # 1. Database Check
+    try:
+        db.execute(text("SELECT 1"))
+        db_status = "Connected"
+    except Exception as e:
+        db_status = f"Error: {str(e)}"
+
+    # 2. API Checks
+    geo_status = check_geoapify_health()
+    ors_status = check_ors_health()
+
+    # 3. Background Process Heartbeat
+    queue_alive = (time.time() - LAST_QUEUE_RUN) < 60 if LAST_QUEUE_RUN > 0 else False
+
+
+    return {
+        "services": {
+            "database": db_status,
+            "geoapify": geo_status,
+            "ors_routing": ors_status,
+        },
+        "engine": {
+            "queue_processor": "Active" if queue_alive else "Inactive",
+            "system_time": datetime.now().isoformat()
+        }
+    }

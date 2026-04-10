@@ -11,6 +11,7 @@ import EmergencyCentersPage from "./pages/EmergencyCentersPage.jsx";
 import UsersPage from "./pages/UsersPage.jsx";
 import LogsPage from "./pages/LogsPage.jsx";
 import SettingsPage from "./pages/SettingsPage.jsx";
+import StatisticsPage from "./pages/StatisticsPage.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -26,6 +27,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/emergency-centers" element={<EmergencyCentersPage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/logs" element={<LogsPage />} />
+        <Route path="/statistics" element={<StatisticsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </BrowserRouter>
