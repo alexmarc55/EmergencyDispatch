@@ -142,21 +142,23 @@ export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
       <ZoomControl position="topright" />
 
       {/* Render Markers */}
-      {incidents.map((incident) => (
-        <Marker
-          key={`incident-${incident.id}`}
-          position={[incident.lat, incident.lon]}
-          icon={incidentIcon}
-        >
-          <Popup>
-            <strong>Incident #{incident.id}</strong>
-            <br />
-            Severity: {incident.severity}
-            <br />
-            Status: {incident.status}
-          </Popup>
-        </Marker>
-      ))}
+      {incidents
+        .filter((incident) => incident.status !== "Resolved")
+        .map((incident) => (
+          <Marker
+            key={`incident-${incident.id}`}
+            position={[incident.lat, incident.lon]}
+            icon={incidentIcon}
+          >
+            <Popup>
+              <strong>Incident #{incident.id}</strong>
+              <br />
+              Severity: {incident.severity}
+              <br />
+              Status: {incident.status}
+            </Popup>
+          </Marker>
+        ))}
 
       {ambulances.map((amb) => (
         <SmoothMarker

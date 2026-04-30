@@ -92,8 +92,9 @@ def create_incident_in_db(incident: Incident, db: Session = Depends(get_db)):
         ended_at=incident.ended_at,
         assigned_units=incident.assigned_units,
         assigned_hospital=incident.assigned_hospital,
-        route_to_incident=incident.route_to_incident,
-        route_to_hospital=incident.route_to_hospital
+        patient_ids=incident.patient_ids, # Added patient_ids
+        route_to_incident=incident.route_to_incident, 
+        route_to_hospital=incident.route_to_hospital,
     )
     db.add(db_incident)
     db.commit()
@@ -114,8 +115,9 @@ def convert_incident_to_response(db_incident: Incident, db: Session = Depends(ge
         type=db_incident.type,
         started_at=start_str,
         ended_at=end_str,
-        assigned_units=db_incident.assigned_units,
-        assigned_hospital=db_incident.assigned_hospital
+        assigned_units=db_incident.assigned_units, 
+        assigned_hospital=db_incident.assigned_hospital,
+        patient_ids=db_incident.patient_ids, # Added patient_ids
     )
     return created
 
@@ -1098,13 +1100,16 @@ def cleanup_stale_missions(db: Session):
 
     logger.info("Checking for interrupted missions...")
     
+    # Only clean up incidents that were assigned but have been idle for too long
+    stale_threshold = datetime.now() - timedelta(hours=1)
     stale_incidents = db.query(IncidentDB).filter(
-        IncidentDB.status == Status.ASSIGNED
+        IncidentDB.status == Status.ASSIGNED,
+        IncidentDB.started_at < stale_threshold
     ).all()
 
     count = 0
     for incident in stale_incidents:
-        logger.warning(f"Resetting interrupted Incident {incident.id}. Adding back to Queue.")
+        logger.warning(f"Resetting stale Incident {incident.id} (started at {incident.started_at}). Adding back to Queue.")
         
         if incident.assigned_units:
             amb = db.query(AmbulanceDB).filter(AmbulanceDB.id.in_(incident.assigned_units)).first()

@@ -16,7 +16,6 @@ import Sidebar from "../components/Sidebar";
 import { get_incidents, health_check } from "../services/api";
 import "./StatisticsPage.css";
 
-// Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,

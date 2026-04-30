@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import SearchBar from "../components/Searchbar";
 import Modal from "../components/Modal";
+import NewIncidentModal from "../components/NewIncidentModal";
 import "./IncidentsPage.css";
 import {
   create_incident,
@@ -21,6 +22,7 @@ export default function IncidentsPage() {
   const [activeModal, setActiveModal] = useState(null);
   const [formData, setFormData] = useState({});
   const [selectedIncident, setSelectedIncident] = useState(null);
+  const [newIncidentModalOpen, setNewIncidentModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const rawRole = localStorage.getItem("user_role");
@@ -179,7 +181,7 @@ export default function IncidentsPage() {
             {(userRole === "admin" || userRole === "operator") && (
               <button
                 className="new-incident-button"
-                onClick={() => openAddModal()}
+                onClick={() => setNewIncidentModalOpen(true)}
               >
                 New Incident
               </button>
@@ -311,68 +313,15 @@ export default function IncidentsPage() {
       </Modal>
 
       {/* --- ADD INCIDENT MODAL --- */}
-      <Modal
-        isOpen={activeModal === "add"}
-        onClose={closeModal}
-        title="Create New Incident"
-        actions={
-          <>
-            <button className="btn-secondary" onClick={closeModal}>
-              Cancel
-            </button>
-            <button className="btn-primary" onClick={handleAddSubmit}>
-              Create Incident
-            </button>
-          </>
-        }
-      >
-        <form>
-          <div className="form-group">
-            <label>Location / Address</label>
-            <input
-              type="text"
-              name="address"
-              placeholder="e.g. Strada Victoriei 5"
-              value={formData.address || ""}
-              onChange={handleInputChange}
-            />
-          </div>
 
-          <div className="form-group">
-            <label>Type of Incident</label>
-            <input
-              type="text"
-              name="type"
-              placeholder="e.g. Car Accident, Heart Attack"
-              value={formData.type || ""}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Severity</label>
-            <select
-              name="severity"
-              value={formData.severity || 1}
-              onChange={handleInputChange}
-            >
-              <option value={1}>1 - Critical</option>
-              <option value={2}>2 - Medium</option>
-              <option value={3}>3 - Low</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Number of Patients</label>
-            <input
-              type="number"
-              name="nr_patients"
-              value={formData.nr_patients || 1}
-              onChange={handleInputChange}
-            />
-          </div>
-        </form>
-      </Modal>
+      <NewIncidentModal
+        isOpen={newIncidentModalOpen}
+        onClose={() => setNewIncidentModalOpen(false)}
+        onSuccess={() => {
+          fetchData();
+          setNewIncidentModalOpen(false);
+        }}
+      />
     </div>
   );
 }
