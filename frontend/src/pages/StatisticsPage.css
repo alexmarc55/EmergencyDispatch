@@ -8,19 +8,19 @@
   display: flex;
   flex: 1;
   overflow: hidden;
+  min-height: 0;
+  height: 0;
 }
 
 .statistics-page {
   flex: 1;
   padding: 40px;
-  transition: margin-left 0.3s ease;
-  width: 100%;
+  transition: all 0.3s ease;
   box-sizing: border-box;
   overflow-y: auto;
-}
-
-.statistics-page.sidebar-open {
-  margin-left: 260px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .stats-grid {

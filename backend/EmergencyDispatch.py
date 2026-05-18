@@ -13,7 +13,7 @@ from PasswordCheck import *
 import models
 from models import *
 from database import engine, SessionLocal
-from sqlalchemy import text
+from sqlalchemy import text, func
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 from datetime import datetime, timedelta
@@ -254,7 +254,12 @@ def get_emergency_center_by_id(emergency_center_id: int, db: Session = Depends(g
     return emergency_center
 
 def create_emergency_center_in_db(emergency_center: EmergencyCenter, db: Session = Depends(get_db)):
+    max_hospital_id = db.query(func.max(HospitalDB.id)).scalar() or 0
+    max_center_id = db.query(func.max(EmergencyCentersDB.id)).scalar() or 0
+    new_id = max(max_hospital_id, max_center_id) + 1
+
     db_emergency_center = EmergencyCentersDB(
+        id=new_id,
         name=emergency_center.name,
         lat=emergency_center.lat,
         lon=emergency_center.lon
@@ -798,8 +803,8 @@ async def _dispatch_single_ambulance(
         amb.default_lon, amb.default_lat
     )
 
-    scene_time = 5
-    hospital_time = 5
+    scene_time = 1
+    hospital_time = 1
     total_time = eta + scene_time + hospital_eta + hospital_time
     return_time = datetime.now() + timedelta(minutes=total_time)
 

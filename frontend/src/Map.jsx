@@ -35,8 +35,22 @@ const hospitalIcon = new L.Icon({
   popupAnchor: [0, -15],
 });
 
-export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
+const emergencyCenterIcon = new L.Icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/128/11941/11941702.png",
+  iconSize: [35, 35],
+  iconAnchor: [17, 17],
+  popupAnchor: [0, -15],
+});
+
+export default function Map({
+  sidebarOpen,
+  incidents,
+  ambulances,
+  hospitals,
+  emergencyCenters,
+}) {
   const position = [47.657, 23.59];
+  const [arrivedAtIncident, setArrivedAtIncident] = useState({});
 
   const getProgressiveRoute = (fullRoute, currentLat, currentLon) => {
     if (!fullRoute || fullRoute.length === 0) return [];
@@ -64,68 +78,96 @@ export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
     return leafletRoute.slice(closestIndex);
   };
 
+  useEffect(() => {
+    const newArrivals = { ...arrivedAtIncident };
+    let changed = false;
+
+    incidents.forEach((incident) => {
+      const assignedIds = incident.assigned_units || [];
+      assignedIds.forEach((ambId) => {
+        const key = `${ambId}-${incident.id}`;
+        if (newArrivals[key]) return; // Already latched, skip
+
+        const assignedAmb = ambulances.find((a) => a.id === ambId);
+        const routeInc = incident.route_to_incident?.[String(ambId)];
+
+        if (assignedAmb && routeInc && routeInc.length > 0) {
+          const lastPoint = routeInc[routeInc.length - 1];
+          const dist = Math.hypot(
+            lastPoint[1] - assignedAmb.lat,
+            lastPoint[0] - assignedAmb.lon,
+          );
+
+          // If close enough to the end of the red line, latch it
+          if (dist < 0.0005) {
+            newArrivals[key] = true;
+            changed = true;
+          }
+        }
+      });
+    });
+
+    if (changed) {
+      setArrivedAtIncident(newArrivals);
+    }
+  }, [ambulances, incidents, arrivedAtIncident]);
+
   const activeRoutes = useMemo(() => {
     const lines = [];
 
     incidents.forEach((incident) => {
+      if (incident.status === "Resolved") return;
       const assignedIds = incident.assigned_units || [];
 
       assignedIds.forEach((ambId) => {
         const assignedAmb = ambulances.find((a) => a.id === ambId);
         if (!assignedAmb) return;
 
-        // Only draw lines for active dispatch states
-        if (incident.status === "Assigned" || incident.status === "Queued") {
-          const ambKey = String(ambId);
-          const routeInc = incident.route_to_incident?.[ambKey];
-          const routeHosp = incident.route_to_hospital?.[ambKey];
+        const ambKey = String(ambId);
+        const arrivalKey = `${ambId}-${incident.id}`;
+        const hasArrived = arrivedAtIncident[arrivalKey];
 
-          // 1. Calculate progress on the incident route
+        // 1. If not arrived yet, show Red Line (Incident)
+        if (!hasArrived) {
+          const routeInc = incident.route_to_incident?.[ambKey];
           const remainingToInc = getProgressiveRoute(
             routeInc,
             assignedAmb.lat,
             assignedAmb.lon,
           );
 
-          // 2. Determine if we should show the Incident route or Hospital route
-          // We are "At Incident" if we have reached the end of the incident route
-          // or if we have already started moving along the hospital route.
-          const finishedIncRoute =
-            !remainingToInc || remainingToInc.length <= 1;
-
-          if (!finishedIncRoute) {
-            // STILL GOING TO INCIDENT
+          if (remainingToInc.length > 1) {
             lines.push({
               id: `inc-${incident.id}-amb-${ambId}`,
               positions: remainingToInc,
               color: "#ff2222",
               weight: 4,
-              opacity: 0.7,
             });
-          } else if (routeHosp) {
-            // AT INCIDENT OR MOVING TO HOSPITAL
-            const hospitalPath = getProgressiveRoute(
-              routeHosp,
-              assignedAmb.lat,
-              assignedAmb.lon,
-            );
+          }
+        }
+        // 2. If arrived, show Blue Line (Hospital)
+        else {
+          const routeHosp = incident.route_to_hospital?.[ambKey];
+          const hospitalPath = getProgressiveRoute(
+            routeHosp,
+            assignedAmb.lat,
+            assignedAmb.lon,
+          );
 
-            if (hospitalPath.length > 1) {
-              lines.push({
-                id: `hos-${incident.id}-amb-${ambId}`,
-                positions: hospitalPath,
-                color: "#2244ff",
-                weight: 4,
-                opacity: 0.7,
-              });
-            }
+          if (hospitalPath.length > 1) {
+            lines.push({
+              id: `hos-${incident.id}-amb-${ambId}`,
+              positions: hospitalPath,
+              color: "#2244ff",
+              weight: 4,
+            });
           }
         }
       });
     });
 
     return lines;
-  }, [incidents, ambulances]);
+  }, [incidents, ambulances, arrivedAtIncident]);
 
   return (
     <MapContainer
@@ -182,6 +224,18 @@ export default function Map({ sidebarOpen, incidents, ambulances, hospitals }) {
         >
           <Popup>
             <strong>{hospital.name}</strong>
+          </Popup>
+        </Marker>
+      ))}
+
+      {emergencyCenters.map((center) => (
+        <Marker
+          key={`center-${center.id}`}
+          position={[center.lat, center.lon]}
+          icon={emergencyCenterIcon}
+        >
+          <Popup>
+            <strong>{center.name}</strong>
           </Popup>
         </Marker>
       ))}

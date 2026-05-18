@@ -12,7 +12,7 @@ class Incident(BaseModel):
     nr_patients: Optional[int] = 1
     total_patients: Optional[int] = 1
     assigned_units: Optional[List[int]] = None
-    patient_ids: Optional[List[int]] = None # Added patient_ids field
+    patient_ids: Optional[List[int]] = None
     assigned_hospital: Optional[int] = None
     route_to_incident: Optional[Dict[int, List[Any]]] = {}
     route_to_hospital: Optional[Dict[int, List[Any]]] = {}
@@ -31,4 +31,4 @@ class IncidentUpdate(BaseModel):
     lon: Optional[float] = None
     assigned_unit: Optional[int] = None
     assigned_hospital: Optional[int] = None
-    patient_ids: Optional[List[int]] = None # Added patient_ids to update model
+    patient_ids: Optional[List[int]] = None

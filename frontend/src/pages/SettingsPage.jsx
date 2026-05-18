@@ -71,6 +71,7 @@ export default function SettingsPage() {
             <h3>Badge Number: {userInfo.badge_number}</h3>
           </div>
           <div className="security-section">
+            <h2>Security Settings</h2>
             <h2>Change Password</h2>
             <input
               type="password"

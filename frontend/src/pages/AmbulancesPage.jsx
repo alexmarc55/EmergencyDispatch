@@ -13,6 +13,7 @@ import {
   convert_address,
   get_hospitals,
   get_users,
+  get_emergency_centers,
 } from "../services/api";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
@@ -116,8 +117,10 @@ export default function AmbulancesPage() {
       };
 
       const hospital = await fetchHospitalById(formData.base_hospital_id);
-      if (!hospital) {
-        alert("Base Hospital ID is invalid.");
+      const center = await fetchEmergencyCenterById(formData.base_hospital_id);
+
+      if (!hospital && !center) {
+        alert("Base ID is invalid.");
         return;
       }
 
@@ -155,25 +158,27 @@ export default function AmbulancesPage() {
   const handleAddSubmit = async (e) => {
     e.preventDefault();
     try {
-      const hospital = await fetchHospitalById(formData.base_hospital_id);
-      if (!hospital) {
-        alert("Base Hospital ID is invalid.");
-        return;
-      }
-
       const driver = await fetchUserbyId(formData.driver_id);
       if (!driver || driver.role.toLowerCase() !== "driver") {
         alert("Driver ID is invalid.");
         return;
       }
 
+      const hospital = await fetchHospitalById(formData.base_hospital_id);
+      const center = await fetchEmergencyCenterById(formData.base_hospital_id);
+
+      if (!hospital && !center) {
+        alert("Base ID is invalid.");
+        return;
+      }
+
       const newAmbulance = {
         status: formData.status || "Available",
         capacity: parseInt(formData.capacity) || 1,
-        lat: hospital.lat,
-        lon: hospital.lon,
-        default_lat: hospital.lat,
-        default_lon: hospital.lon,
+        lat: hospital?.lat || center?.lat,
+        lon: hospital?.lon || center?.lon,
+        default_lat: hospital?.lat || center?.lat,
+        default_lon: hospital?.lon || center?.lon,
         driver_id: formData.driver_id || null,
         base_hospital_id: formData.base_hospital_id || null,
       };
@@ -199,6 +204,18 @@ export default function AmbulancesPage() {
       return hospital;
     } catch (error) {
       console.error("Failed to fetch hospital data:", error);
+      return null;
+    }
+  };
+
+  const fetchEmergencyCenterById = async (centerId) => {
+    try {
+      centerId = parseInt(centerId);
+      const centers = await get_emergency_centers();
+      const center = centers.find((c) => c.id === centerId);
+      return center;
+    } catch (error) {
+      console.error("Failed to fetch emergency center data:", error);
       return null;
     }
   };

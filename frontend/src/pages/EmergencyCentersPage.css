@@ -1,11 +1,27 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  height: 0;
+}
+
 .emergency-centers-page {
   flex: 1;
   padding: 20px;
   background-color: #ff2929;
-  transition: margin-left 0.3s ease;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  min-height: 95vh;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .emergency-centers-page h1 {
@@ -19,10 +35,6 @@
   align-items: center;
   margin-bottom: 20px;
   gap: 20px;
-}
-
-.emergency-centers-page.sidebar-open {
-  margin-left: 250px;
 }
 
 .emergency-centers-list {
@@ -59,26 +71,26 @@
   right: 15px;
   display: flex;
   gap: 10px;
-  margin: 0; 
+  margin: 0;
 }
 
 .new-center-button-container {
-    position: absolute;
-    right: 40px;
-    top: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    margin-bottom: 10px;
+  position: absolute;
+  right: 40px;
+  top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 10px;
 }
 
 .new-center-button {
-    background-color: #fcfcfc;
-    color: rgb(236, 41, 41);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: #fcfcfc;
+  color: rgb(236, 41, 41);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }

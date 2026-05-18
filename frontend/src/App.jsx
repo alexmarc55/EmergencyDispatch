@@ -8,6 +8,7 @@ import {
   get_incidents,
   get_ambulances,
   get_hospitals,
+  get_emergency_centers,
   get_logs,
 } from "./services/api";
 import { FaPlus } from "react-icons/fa";
@@ -20,6 +21,7 @@ export default function App() {
   const [incidents, setIncidents] = useState([]);
   const [ambulances, setAmbulances] = useState([]);
   const [hospitals, setHospitals] = useState([]);
+  const [emergencyCenters, setEmergencyCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newIncidentModalOpen, setNewIncidentModalOpen] = useState(false);
   const [lastSeenLog, setLastSeenLog] = useState("");
@@ -63,19 +65,28 @@ export default function App() {
 
   const fetchData = async () => {
     try {
-      const [incidentsData, ambulancesData, hospitalData] = await Promise.all([
+      const [
+        incidentsData,
+        ambulancesData,
+        hospitalData,
+        emergencyCentersData,
+      ] = await Promise.all([
         get_incidents(),
         get_ambulances(),
         get_hospitals(),
+        get_emergency_centers(),
       ]);
       setIncidents(incidentsData);
       setAmbulances(ambulancesData);
       setHospitals(hospitalData);
+      setEmergencyCenters(emergencyCentersData);
 
       const userId = parseInt(localStorage.getItem("user_id"));
       const myAmbulance = ambulancesData.find((a) => a.driver_id === userId);
       const myIncident = incidentsData.find(
-        (i) => i.assigned_unit === myAmbulance?.id && i.status !== "Resolved",
+        (i) =>
+          i.assigned_units?.includes(myAmbulance?.id) &&
+          i.status !== "Resolved",
       );
       const myHospital = hospitalData.find(
         (h) => h.id === myIncident?.assigned_hospital,
@@ -122,6 +133,7 @@ export default function App() {
             incidents={incidents}
             ambulances={ambulances}
             hospitals={hospitals}
+            emergencyCenters={emergencyCenters}
             loading={loading}
           />
         )}

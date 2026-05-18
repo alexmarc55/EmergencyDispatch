@@ -10,8 +10,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./DriverMap.css";
 import SmoothMarker from "./components/SmoothMarker";
-import { useEffect, useState } from "react";
-import { useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useMap } from "react-leaflet";
 import "leaflet-rotate";
 
@@ -36,6 +35,33 @@ const hospitalIcon = new L.Icon({
   iconAnchor: [17, 17],
   popupAnchor: [0, -15],
 });
+
+// Defined outside component — pure function, no hooks needed
+function getProgressiveRoute(fullRoute, currentLat, currentLon) {
+  if (!fullRoute || fullRoute.length === 0) return [];
+
+  const leafletRoute = fullRoute.map((c) => [c[1], c[0]]); // [lon,lat] → [lat,lon]
+
+  let closestIndex = 0;
+  let minDistance = Infinity;
+
+  for (let i = 0; i < leafletRoute.length; i++) {
+    const dist = Math.hypot(
+      leafletRoute[i][0] - currentLat,
+      leafletRoute[i][1] - currentLon,
+    );
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestIndex = i;
+    }
+  }
+
+  if (closestIndex === leafletRoute.length - 1 && minDistance < 0.0005) {
+    return [];
+  }
+
+  return leafletRoute.slice(closestIndex);
+}
 
 function CameraFollower({ lat, lon, heading }) {
   const map = useMap();
@@ -114,7 +140,120 @@ export default function DriverMap({
   ambulance,
   hospital,
 }) {
-  console.log("New Ambulance Coords:", ambulance?.lat, ambulance?.lon);
+  // 1. Add state to latch the arrival
+  const [hasArrived, setHasArrived] = useState(false);
+
+  // 2. Latch logic: Once true, it stays true for this incident
+  useEffect(() => {
+    if (hasArrived || !ambulance || !incident) return;
+
+    const ambKey = String(ambulance.id);
+    const routeInc = incident.route_to_incident?.[ambKey];
+
+    if (routeInc && routeInc.length > 0) {
+      const [lastLon, lastLat] = routeInc[routeInc.length - 1];
+      const dist = Math.hypot(ambulance.lat - lastLat, ambulance.lon - lastLon);
+
+      // If within ~20-30 meters of the incident destination
+      if (dist < 0.0003) {
+        setHasArrived(true);
+      }
+    }
+  }, [ambulance?.lat, ambulance?.lon, incident?.id, hasArrived]);
+
+  // Reset arrival state if the incident changes or is resolved
+  useEffect(() => {
+    setHasArrived(false);
+  }, [incident?.id]);
+
+  const activeRoute = useMemo(() => {
+    const lines = [];
+    if (!incident || !ambulance?.id) return lines;
+
+    // Only show routes for active dispatches
+    if (incident.status !== "Assigned" && incident.status !== "Queued")
+      return lines;
+
+    const ambKey = String(ambulance.id);
+
+    // 3. Use the latched state to decide which route to process
+    if (!hasArrived) {
+      // EN ROUTE TO INCIDENT
+      const routeInc = incident.route_to_incident?.[ambKey];
+      const remainingToInc = getProgressiveRoute(
+        routeInc,
+        ambulance.lat,
+        ambulance.lon,
+      );
+
+      if (remainingToInc.length > 1) {
+        lines.push({
+          id: `inc-${incident.id}`,
+          positions: remainingToInc,
+          color: "#ff2222",
+          weight: 5,
+          opacity: 0.7,
+        });
+      }
+    } else {
+      // TRANSPORTING TO HOSPITAL
+      const routeHosp = incident.route_to_hospital?.[ambKey];
+      if (routeHosp) {
+        const hospitalPath = getProgressiveRoute(
+          routeHosp,
+          ambulance.lat,
+          ambulance.lon,
+        );
+        if (hospitalPath.length > 1) {
+          lines.push({
+            id: `hos-${incident.id}`,
+            positions: hospitalPath,
+            color: "#2244ff",
+            weight: 5,
+            opacity: 0.7,
+          });
+        }
+      }
+    }
+
+    return lines;
+  }, [incident, ambulance.lat, ambulance.lon, hasArrived]);
+
+  const heading = useMemo(() => {
+    const currentLine = activeRoute[0];
+    if (!currentLine || currentLine.positions.length < 2) return 0;
+
+    const positions = currentLine.positions;
+    const LOOKAHEAD = Math.min(5, positions.length - 1);
+
+    const fromLat = ambulance?.lat ?? positions[0][0];
+    const fromLon = ambulance?.lon ?? positions[0][1];
+
+    let sinSum = 0;
+    let cosSum = 0;
+
+    for (let i = 1; i <= LOOKAHEAD; i++) {
+      const toLat = positions[i][0];
+      const toLon = positions[i][1];
+
+      const dLon = ((toLon - fromLon) * Math.PI) / 180;
+      const lat1 = (fromLat * Math.PI) / 180;
+      const lat2 = (toLat * Math.PI) / 180;
+
+      const y = Math.sin(dLon) * Math.cos(lat2);
+      const x =
+        Math.cos(lat1) * Math.sin(lat2) -
+        Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+
+      const bearing = Math.atan2(y, x);
+      sinSum += Math.sin(bearing);
+      cosSum += Math.cos(bearing);
+    }
+
+    const avgBearing = Math.atan2(sinSum / LOOKAHEAD, cosSum / LOOKAHEAD);
+    return ((avgBearing * 180) / Math.PI + 360) % 360;
+  }, [activeRoute, ambulance]);
+
   if (!ambulance?.id) {
     return (
       <div className="driver-waiting">
@@ -125,111 +264,6 @@ export default function DriverMap({
       </div>
     );
   }
-
-  // console.log("DriverMap received props:", { incident, ambulance, hospital });
-
-  const getProgressiveRoute = (fullRoute, currentLat, currentLon) => {
-    if (!fullRoute || fullRoute.length === 0) return [];
-
-    const leafletRoute = fullRoute.map((c) => [c[1], c[0]]);
-
-    let closestIndex = 0;
-    let minDistance = Infinity;
-
-    for (let i = 0; i < leafletRoute.length; i++) {
-      const dist = Math.sqrt(
-        Math.pow(leafletRoute[i][0] - currentLat, 2) +
-          Math.pow(leafletRoute[i][1] - currentLon, 2),
-      );
-
-      if (dist < minDistance) {
-        minDistance = dist;
-        closestIndex = i;
-      }
-    }
-    return leafletRoute.slice(closestIndex);
-  };
-
-  const activeRoute = useMemo(() => {
-    const lines = [];
-    if (incident && ambulance && hospital) {
-      if (ambulance && incident && incident.status === "Assigned") {
-        const distanceToIncident = Math.sqrt(
-          Math.pow(ambulance.lat - incident.lat, 2) +
-            Math.pow(ambulance.lon - incident.lon, 2),
-        );
-
-        const routeEnd = incident.route_to_incident?.at(-1);
-
-        const distanceToRouteEnd = routeEnd
-          ? Math.sqrt(
-              Math.pow(ambulance.lat - routeEnd[1], 2) +
-                Math.pow(ambulance.lon - routeEnd[0], 2),
-            )
-          : distanceToIncident;
-        const hasArrivedAtIncident = distanceToRouteEnd < 0.001; // 100 meters
-
-        if (incident.route_to_incident && !hasArrivedAtIncident) {
-          const remainingToInc = getProgressiveRoute(
-            incident.route_to_incident,
-            ambulance.lat,
-            ambulance.lon,
-          );
-
-          if (remainingToInc.length > 2) {
-            lines.push({
-              id: `inc-${incident.id}`,
-              positions: remainingToInc,
-              color: "#ff2222",
-              weight: 5,
-              opacity: 0.7,
-            });
-          }
-        }
-
-        // 2. Logic for Route to Hospital (Blue Line)
-        if (incident.route_to_hospital && hasArrivedAtIncident) {
-          const hospitalPath = getProgressiveRoute(
-            incident.route_to_hospital,
-            ambulance.lat,
-            ambulance.lon,
-          );
-
-          if (hospitalPath.length > 2) {
-            lines.push({
-              id: `hos-${incident.id}`,
-              positions: hospitalPath,
-              color: "#2244ff",
-              weight: 5,
-              opacity: 0.7,
-            });
-          }
-        }
-      }
-
-      return lines;
-    }
-    return [];
-  }, [incident, ambulance]);
-
-  const heading = useMemo(() => {
-    const currentLine = activeRoute[0];
-    if (!currentLine || currentLine.positions.length < 2) return 0;
-
-    const curr = currentLine.positions[0];
-    const next = currentLine.positions[1];
-
-    const dLon = ((next[1] - curr[1]) * Math.PI) / 180;
-    const y = Math.sin(dLon) * Math.cos((next[0] * Math.PI) / 180);
-    const x =
-      Math.cos((curr[0] * Math.PI) / 180) *
-        Math.sin((next[0] * Math.PI) / 180) -
-      Math.sin((curr[0] * Math.PI) / 180) *
-        Math.cos((next[0] * Math.PI) / 180) *
-        Math.cos(dLon);
-
-    return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
-  }, [activeRoute]);
 
   return (
     <MapContainer
@@ -293,16 +327,15 @@ export default function DriverMap({
         </Marker>
       )}
 
-      {activeRoute.length > 0 &&
-        activeRoute.map((route) => (
-          <Polyline
-            key={route.id}
-            positions={route.positions}
-            color={route.color}
-            weight={route.weight}
-            opacity={route.opacity}
-          />
-        ))}
+      {activeRoute.map((route) => (
+        <Polyline
+          key={route.id}
+          positions={route.positions}
+          color={route.color}
+          weight={route.weight}
+          opacity={route.opacity}
+        />
+      ))}
     </MapContainer>
   );
 }
