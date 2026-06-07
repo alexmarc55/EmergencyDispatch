@@ -10,7 +10,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
 import SmoothMarker from "./components/SmoothMarker";
-import { useEffect, useState } from "react";
 import { useMemo } from "react";
 
 const ambulanceIcon = new L.Icon({
@@ -42,6 +41,12 @@ const emergencyCenterIcon = new L.Icon({
   popupAnchor: [0, -15],
 });
 
+// ========================================================================
+// SOLUȚIA SCHIMBĂRII DE RUTĂ: Cache global persistent pe parcursul sesiunii.
+// Supraviețuiește demontării componentei React (unmount/remount/loading toggles).
+// ========================================================================
+const globalArrivalRegistry = {};
+
 export default function Map({
   sidebarOpen,
   incidents,
@@ -50,10 +55,11 @@ export default function Map({
   emergencyCenters,
 }) {
   const position = [47.657, 23.59];
-  const [arrivedAtIncident, setArrivedAtIncident] = useState({});
 
   const getProgressiveRoute = (fullRoute, currentLat, currentLon) => {
-    if (!fullRoute || fullRoute.length === 0) return [];
+    if (!fullRoute || fullRoute.length === 0) {
+      return { remaining: [], minDistance: Infinity, isAtEnd: false };
+    }
     const leafletRoute = fullRoute.map((c) => [c[1], c[0]]);
 
     let closestIndex = 0;
@@ -70,47 +76,13 @@ export default function Map({
       }
     }
 
-    // If the closest point is the very last point, the route is finished
-    if (closestIndex === leafletRoute.length - 1 && minDistance < 0.0005) {
-      return [];
-    }
-
-    return leafletRoute.slice(closestIndex);
+    const isAtEnd = closestIndex === leafletRoute.length - 1;
+    return {
+      remaining: leafletRoute.slice(closestIndex),
+      minDistance: minDistance,
+      isAtEnd: isAtEnd,
+    };
   };
-
-  useEffect(() => {
-    const newArrivals = { ...arrivedAtIncident };
-    let changed = false;
-
-    incidents.forEach((incident) => {
-      const assignedIds = incident.assigned_units || [];
-      assignedIds.forEach((ambId) => {
-        const key = `${ambId}-${incident.id}`;
-        if (newArrivals[key]) return; // Already latched, skip
-
-        const assignedAmb = ambulances.find((a) => a.id === ambId);
-        const routeInc = incident.route_to_incident?.[String(ambId)];
-
-        if (assignedAmb && routeInc && routeInc.length > 0) {
-          const lastPoint = routeInc[routeInc.length - 1];
-          const dist = Math.hypot(
-            lastPoint[1] - assignedAmb.lat,
-            lastPoint[0] - assignedAmb.lon,
-          );
-
-          // If close enough to the end of the red line, latch it
-          if (dist < 0.0005) {
-            newArrivals[key] = true;
-            changed = true;
-          }
-        }
-      });
-    });
-
-    if (changed) {
-      setArrivedAtIncident(newArrivals);
-    }
-  }, [ambulances, incidents, arrivedAtIncident]);
 
   const activeRoutes = useMemo(() => {
     const lines = [];
@@ -120,44 +92,56 @@ export default function Map({
       const assignedIds = incident.assigned_units || [];
 
       assignedIds.forEach((ambId) => {
+        const arrivalKey = `${incident.id}-${ambId}`;
+
+        if (incident.status === "Resolved") {
+          delete globalArrivalRegistry[arrivalKey];
+          return;
+        }
+
         const assignedAmb = ambulances.find((a) => a.id === ambId);
         if (!assignedAmb) return;
 
+        if (assignedAmb.status === "Available") {
+          delete globalArrivalRegistry[arrivalKey];
+          return;
+        }
+
         const ambKey = String(ambId);
-        const arrivalKey = `${ambId}-${incident.id}`;
-        const hasArrived = arrivedAtIncident[arrivalKey];
+        const routeInc = incident.route_to_incident?.[ambKey];
+        const routeHosp = incident.route_to_hospital?.[ambKey];
 
-        // 1. If not arrived yet, show Red Line (Incident)
-        if (!hasArrived) {
-          const routeInc = incident.route_to_incident?.[ambKey];
-          const remainingToInc = getProgressiveRoute(
-            routeInc,
-            assignedAmb.lat,
-            assignedAmb.lon,
-          );
+        const incInfo = getProgressiveRoute(
+          routeInc,
+          assignedAmb.lat,
+          assignedAmb.lon,
+        );
+        const hospInfo = getProgressiveRoute(
+          routeHosp,
+          assignedAmb.lat,
+          assignedAmb.lon,
+        );
 
-          if (remainingToInc.length > 1) {
+        if (incInfo.isAtEnd) {
+          globalArrivalRegistry[arrivalKey] = true;
+        }
+
+        const headingToHospital = globalArrivalRegistry[arrivalKey] || false;
+
+        if (!headingToHospital) {
+          if (incInfo.remaining.length > 1) {
             lines.push({
               id: `inc-${incident.id}-amb-${ambId}`,
-              positions: remainingToInc,
+              positions: incInfo.remaining,
               color: "#ff2222",
               weight: 4,
             });
           }
-        }
-        // 2. If arrived, show Blue Line (Hospital)
-        else {
-          const routeHosp = incident.route_to_hospital?.[ambKey];
-          const hospitalPath = getProgressiveRoute(
-            routeHosp,
-            assignedAmb.lat,
-            assignedAmb.lon,
-          );
-
-          if (hospitalPath.length > 1) {
+        } else {
+          if (hospInfo.remaining.length > 1 && !hospInfo.isAtEnd) {
             lines.push({
               id: `hos-${incident.id}-amb-${ambId}`,
-              positions: hospitalPath,
+              positions: hospInfo.remaining,
               color: "#2244ff",
               weight: 4,
             });
@@ -167,7 +151,7 @@ export default function Map({
     });
 
     return lines;
-  }, [incidents, ambulances, arrivedAtIncident]);
+  }, [incidents, ambulances]);
 
   return (
     <MapContainer
@@ -246,7 +230,6 @@ export default function Map({
           positions={route.positions}
           color={route.color}
           weight={route.weight}
-          opacity={route.opacity}
         />
       ))}
     </MapContainer>

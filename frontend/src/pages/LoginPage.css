@@ -1,11 +1,10 @@
-.main-content {
+.login-page-wrapper {
   background-color: #d32f2f;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Arial', sans-serif;
-
+  font-family: "Arial", sans-serif;
 }
 
 .container {

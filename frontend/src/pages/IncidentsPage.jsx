@@ -108,6 +108,7 @@ export default function IncidentsPage() {
         status: formData.status,
         type: formData.type,
         nr_patients: formData.nr_patients,
+        needs_UPU: formData.needs_UPU || true,
       };
       const updated = await update_incident(payload);
 
@@ -157,6 +158,7 @@ export default function IncidentsPage() {
         nr_patients: parseInt(formData.nr_patients) || 1,
         lat: coords.lat,
         lon: coords.lon,
+        needs_UPU: formData.needs_UPU || true,
       };
 
       const created = await create_incident(newIncident);
@@ -308,6 +310,17 @@ export default function IncidentsPage() {
               value={formData.nr_patients || ""}
               onChange={handleInputChange}
             />
+          </div>
+          <div className="form-group">
+            <label>Needs Urgent Care? (UPU)</label>
+            <select
+              name="needs_UPU"
+              value={formData.needs_UPU || true}
+              onChange={handleInputChange}
+            >
+              <option value={true}>Yes</option>
+              <option value={false}>No</option>
+            </select>
           </div>
         </form>
       </Modal>

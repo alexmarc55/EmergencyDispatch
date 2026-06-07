@@ -39,11 +39,11 @@
 
 .ambulances-list {
   width: 100%;
-  max-width: 1200px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 12px;
+  flex-basis: calc(50% - 12px);
   margin-top: 20px;
   align-items: flex-start;
 }

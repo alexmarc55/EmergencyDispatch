@@ -15,21 +15,19 @@ import StatisticsPage from "./pages/StatisticsPage.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/incidents" element={<IncidentsPage />} />
-        <Route path="/ambulances" element={<AmbulancesPage />} />
-        <Route path="/login_page" element={<LoginPage />} />
-        <Route path="/patients" element={<PatientsPage />} />
-        <Route path="/hospitals" element={<HospitalsPage />} />
-        <Route path="/emergency-centers" element={<EmergencyCentersPage />} />
-        <Route path="/users" element={<UsersPage />} />
-        <Route path="/logs" element={<LogsPage />} />
-        <Route path="/statistics" element={<StatisticsPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Routes>
-    </BrowserRouter>
-  </React.StrictMode>,
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<App />} />
+      <Route path="/incidents" element={<IncidentsPage />} />
+      <Route path="/ambulances" element={<AmbulancesPage />} />
+      <Route path="/login_page" element={<LoginPage />} />
+      <Route path="/patients" element={<PatientsPage />} />
+      <Route path="/hospitals" element={<HospitalsPage />} />
+      <Route path="/emergency-centers" element={<EmergencyCentersPage />} />
+      <Route path="/users" element={<UsersPage />} />
+      <Route path="/logs" element={<LogsPage />} />
+      <Route path="/statistics" element={<StatisticsPage />} />
+      <Route path="/settings" element={<SettingsPage />} />
+    </Routes>
+  </BrowserRouter>,
 );

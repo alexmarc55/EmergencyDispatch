@@ -31,6 +31,7 @@
   font-size: 50px;
   margin: 0;
 }
+
 .header {
   display: flex;
   align-items: center;
@@ -40,7 +41,7 @@
 
 .incidents-list {
   width: 100%;
-  max-width: 1200px;
+  flex-basis: calc(50% - 12px);
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;

@@ -26,7 +26,13 @@ export default function NewIncidentModal({ isOpen, onClose, onSuccess }) {
 
   useEffect(() => {
     if (isOpen) {
-      setFormData({ address: "", type: "", severity: 1, nr_patients: 1 });
+      setFormData({
+        address: "",
+        type: "",
+        severity: 1,
+        nr_patients: 1,
+        needs_UPU: true,
+      });
       setSelectedPatients(Array(1).fill(null));
       setLoading(false);
     }
@@ -87,6 +93,7 @@ export default function NewIncidentModal({ isOpen, onClose, onSuccess }) {
       const patientIds = selectedPatients
         .filter((p) => p && p.id)
         .map((p) => p.id);
+
       const newIncident = {
         severity: parseInt(formData.severity),
         status: "Active",
@@ -95,6 +102,7 @@ export default function NewIncidentModal({ isOpen, onClose, onSuccess }) {
         lat: coords.lat,
         lon: coords.lon,
         patient_ids: patientIds,
+        needs_UPU: formData.needs_UPU || true,
       };
       const created = await create_incident(newIncident);
       try {
@@ -180,6 +188,18 @@ export default function NewIncidentModal({ isOpen, onClose, onSuccess }) {
           </div>
 
           <div className="form-group">
+            <label>Needs Urgent Care? (UPU) </label>
+            <select
+              name="needs_UPU"
+              value={formData.needs_UPU || true}
+              onChange={handleInputChange}
+            >
+              <option value={true}>Yes</option>
+              <option value={false}>No</option>
+            </select>
+          </div>
+
+          <div className="form-group">
             <label>Number of Patients</label>
             <input
               type="number"
@@ -226,7 +246,7 @@ export default function NewIncidentModal({ isOpen, onClose, onSuccess }) {
         </form>
       </Modal>
 
-      {/* Patient Selection Modal — rendered outside the main Modal to avoid nesting issues */}
+      {/* Patient Selection Modal */}
       <PatientSelectionModal
         isOpen={isPatientSelectionModalOpen}
         onClose={() => {

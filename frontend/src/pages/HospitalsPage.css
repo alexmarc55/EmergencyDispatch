@@ -40,7 +40,7 @@
 
 .hospitals-list {
   width: 100%;
-  max-width: 1200px;
+  flex-basis: calc(50% - 12px);
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -64,6 +64,10 @@
 .hospitals-card h2 {
   color: black;
   margin-top: 0;
+  padding-right: 70px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .CRUD-buttons {

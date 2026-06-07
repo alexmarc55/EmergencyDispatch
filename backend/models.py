@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
@@ -32,6 +32,7 @@ class IncidentDB(Base):
     patient_ids = Column(JSON, nullable=True)
     route_to_incident = Column(JSON, nullable=True)
     route_to_hospital = Column(JSON, nullable=True)
+    needs_UPU = Column(Boolean, nullable=True)
     started_at = Column(DateTime, nullable=True)
     ended_at = Column(DateTime, nullable=True)
     processing_time_seconds = Column(Integer, nullable=True)
