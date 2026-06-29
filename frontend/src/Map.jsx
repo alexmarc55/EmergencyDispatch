@@ -41,12 +41,6 @@ const emergencyCenterIcon = new L.Icon({
   popupAnchor: [0, -15],
 });
 
-// ========================================================================
-// SOLUȚIA SCHIMBĂRII DE RUTĂ: Cache global persistent pe parcursul sesiunii.
-// Supraviețuiește demontării componentei React (unmount/remount/loading toggles).
-// ========================================================================
-const globalArrivalRegistry = {};
-
 export default function Map({
   sidebarOpen,
   incidents,
@@ -91,11 +85,13 @@ export default function Map({
       if (incident.status === "Resolved") return;
       const assignedIds = incident.assigned_units || [];
 
+      // For consistency, we use localStorage to track if an ambulance has arrived at the incident. This avoids issues with account-switching
+
       assignedIds.forEach((ambId) => {
-        const arrivalKey = `${incident.id}-${ambId}`;
+        const arrivalKey = `arrived-${incident.id}-${ambId}`;
 
         if (incident.status === "Resolved") {
-          delete globalArrivalRegistry[arrivalKey];
+          localStorage.removeItem(arrivalKey);
           return;
         }
 
@@ -103,7 +99,7 @@ export default function Map({
         if (!assignedAmb) return;
 
         if (assignedAmb.status === "Available") {
-          delete globalArrivalRegistry[arrivalKey];
+          localStorage.removeItem(arrivalKey);
           return;
         }
 
@@ -123,10 +119,10 @@ export default function Map({
         );
 
         if (incInfo.isAtEnd) {
-          globalArrivalRegistry[arrivalKey] = true;
+          localStorage.setItem(arrivalKey, "true");
         }
 
-        const headingToHospital = globalArrivalRegistry[arrivalKey] || false;
+        const headingToHospital = localStorage.getItem(arrivalKey) === "true";
 
         if (!headingToHospital) {
           if (incInfo.remaining.length > 1) {
@@ -159,6 +155,7 @@ export default function Map({
       zoom={13}
       style={{ height: "100vh", width: "100%" }}
       zoomControl={false}
+      rotateControl={false}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

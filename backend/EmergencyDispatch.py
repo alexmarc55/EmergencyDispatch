@@ -40,7 +40,7 @@ models.Base.metadata.create_all(bind=engine)
 async def startup_event():
     db = SessionLocal()
     try:
-        cleanup_stale_missions(db)
+        await cleanup_stale_missions(db)
     finally:
         db.close()
 
@@ -442,10 +442,18 @@ async def update_incident(updated_incident: IncidentUpdate, db: Session = Depend
 
 @app.delete("/delete_incident")
 async def delete_incident(incident_id: int, db: Session = Depends(get_db)):
-    success = delete_incident_in_db(incident_id, db)
-    if not success:
+    incident = db.query(IncidentDB).filter(IncidentDB.id == incident_id).first()
+    if not incident:
         logger.warning(f"Incident with ID {incident_id} was not found.")
         raise HTTPException(status_code=404, detail="Incident not found")
+
+    assigned_units = list(incident.assigned_units or [])
+    
+    db.delete(incident)
+    db.commit()
+
+    for amb_id in assigned_units:
+        await cancel_and_return_to_base(amb_id, db)
 
     logger.info(f"Incident with ID {incident_id} was successfully deleted!")
     return {"msg": "Incident was successfully deleted"}
@@ -789,7 +797,8 @@ async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Sess
 
     end_time = datetime.now()
     incident.processing_time_seconds = (end_time - start_time).total_seconds()
-
+    db.commit()
+    
     return {
         "msg": (
             f"{len(selected)} ambulance(s) dispatched"
@@ -821,6 +830,80 @@ async def dispatch(incident_id: int, background_tasks: BackgroundTasks, db: Sess
     }
 
 CANCELLATION_TOKENS = {}
+
+async def cancel_and_return_to_base(ambulance_id: int, db: Session):
+    if ambulance_id in CANCELLATION_TOKENS:
+        logger.info(f"Cancelling active animation task for ambulance {ambulance_id}")
+        CANCELLATION_TOKENS[ambulance_id].set()
+        del CANCELLATION_TOKENS[ambulance_id]
+        await asyncio.sleep(0.1)
+
+    ambulance = db.query(AmbulanceDB).filter(AmbulanceDB.id == ambulance_id).first()
+    if not ambulance:
+        return
+
+    route_to_base = get_route_geometry(
+        ambulance.lon, ambulance.lat,
+        ambulance.default_lon, ambulance.default_lat
+    )
+    back_to_base_eta = get_return_eta(ambulance)
+    if not route_to_base:
+        route_to_base = [[ambulance.lon, ambulance.lat], [ambulance.default_lon, ambulance.default_lat]]
+        back_to_base_eta = 1.0
+
+    ambulance.status = Status.AVAILABLE
+    db.commit()
+
+    asyncio.create_task(
+        animate_return_to_base(
+            ambulance_id,
+            route_to_base,
+            back_to_base_eta
+        )
+    )
+
+async def animate_return_to_base(ambulance_id: int, route_to_base, back_to_base_eta):
+    db = SessionLocal()
+    logger.info(f"Ambulance {ambulance_id} starting return-to-base animation...")
+    try:
+        ambulance = get_ambulance_by_id(ambulance_id, db)
+        if not ambulance:
+            return
+        
+        cancel_event = asyncio.Event()
+        CANCELLATION_TOKENS[ambulance_id] = cancel_event
+
+        point_counter = 0
+        commit_every_n_points = 3
+
+        for coord in route_to_base:
+            if cancel_event.is_set():
+                logger.info(f"Return-to-base animation for ambulance {ambulance_id} intercepted/cancelled.")
+                return
+
+            if not coord or len(coord) < 2: continue
+
+            ambulance.lon = coord[0]
+            ambulance.lat = coord[1]
+            point_counter += 1
+            if point_counter % commit_every_n_points == 0 or coord == route_to_base[-1]:
+                try:
+                    db.commit()
+                except Exception as e:
+                    logger.error(f"DB commit error for ambulance {ambulance_id}: {e}")
+                    db.rollback()
+
+            await asyncio.sleep((back_to_base_eta / len(route_to_base)) * 60)
+
+        if ambulance_id in CANCELLATION_TOKENS and CANCELLATION_TOKENS[ambulance_id] == cancel_event:
+            del CANCELLATION_TOKENS[ambulance_id]
+
+        logger.info(f"Ambulance {ambulance_id} successfully returned to base.")
+
+    except Exception as e:
+        logger.error(f"Error returning ambulance {ambulance_id} to base: {e}")
+    finally:
+        db.close()
 
 async def _dispatch_single_ambulance(
     amb, eta, incident, closest_hospital, hospital_eta, background_tasks=None, db=None
@@ -1050,7 +1133,6 @@ async def get_route_geometry_endpoint(
     }
 
 
-# Function that animates ambulance movement to incident -> hospital -> back to base
 async def animate_ambulance_movement(
     ambulance_id: int,
     incident_id: int,
@@ -1071,12 +1153,19 @@ async def animate_ambulance_movement(
         db.refresh(ambulance)
         db.refresh(incident)
 
+        cancel_event = asyncio.Event()
+        CANCELLATION_TOKENS[ambulance_id] = cancel_event
+
         logger.info(f"Ambulance {ambulance.id} starting journey to incident {incident.id}")
         
         point_counter = 0
         commit_every_n_points = 3
 
         for coord in route_to_incident:
+            if cancel_event.is_set():
+                logger.info(f"Ambulance {ambulance_id} animation cancelled during route_to_incident.")
+                return
+
             if not coord or len(coord) < 2: continue
 
             ambulance.lon = coord[0]
@@ -1091,25 +1180,45 @@ async def animate_ambulance_movement(
                     db.refresh(ambulance)
                 await asyncio.sleep((eta / len(route_to_incident)) * 60)
 
+        if cancel_event.is_set():
+            return
+
         logger.info(f"Ambulance {ambulance.id} arrived at incident {incident.id}")
-        await asyncio.sleep(scene_time * 60)
+        for _ in range(int(scene_time * 60)):
+            if cancel_event.is_set():
+                return
+            await asyncio.sleep(1)
+
+        if cancel_event.is_set():
+            return
 
         logger.info(f"Ambulance {ambulance.id} heading to hospital")
         for coord in route_to_hospital:
+            if cancel_event.is_set():
+                logger.info(f"Ambulance {ambulance_id} animation cancelled during route_to_hospital.")
+                return
+
             if not coord or len(coord) < 2: continue
             ambulance.lon = coord[0]
             ambulance.lat = coord[1]
             db.commit()
             await asyncio.sleep((hospital_eta / len(route_to_hospital)) * 60)
 
-        logger.info(f"Ambulance {ambulance.id} arrived at hospital")
-        await asyncio.sleep(hospital_time * 60)
+        if cancel_event.is_set():
+            return
 
-        # Mark this ambulance as available
+        logger.info(f"Ambulance {ambulance.id} arrived at hospital")
+        for _ in range(int(hospital_time * 60)):
+            if cancel_event.is_set():
+                return
+            await asyncio.sleep(1)
+
+        if cancel_event.is_set():
+            return
+
         ambulance.status = Status.AVAILABLE
         db.commit()
 
-        # Only resolve the incident if no other ambulance is still BUSY on it
         db.refresh(incident)
         other_busy = db.query(AmbulanceDB).filter(
             AmbulanceDB.status == Status.BUSY,
@@ -1125,14 +1234,11 @@ async def animate_ambulance_movement(
         else:
             logger.info(f"Ambulance {ambulance_id} finished but incident {incident_id} still has active units.")
         
-        cancel_event = asyncio.Event()
-        CANCELLATION_TOKENS[ambulance_id] = cancel_event
         point_counter = 0
         commit_every_n_points = 3
         logger.info(f"Ambulance {ambulance.id} returning to base (Open for interception)...")
 
         for coord in route_to_assigned_unit:
-            # Interception check before each movement step back to base
             if cancel_event.is_set():
                 logger.info(f"Old animation thread for ambulance {ambulance_id} killed successfully.")
                 return
@@ -1162,11 +1268,10 @@ async def animate_ambulance_movement(
     finally:
         db.close()
 
-def cleanup_stale_missions(db: Session):
+async def cleanup_stale_missions(db: Session):
 
     logger.info("Checking for interrupted missions...")
     
-    # Only clean up incidents that were assigned but have been idle for too long
     stale_threshold = datetime.now() - timedelta(hours=1)
     stale_incidents = db.query(IncidentDB).filter(
         IncidentDB.status == Status.ASSIGNED,
@@ -1177,17 +1282,17 @@ def cleanup_stale_missions(db: Session):
     for incident in stale_incidents:
         logger.warning(f"Resetting stale Incident {incident.id} (started at {incident.started_at}). Adding back to Queue.")
         
-        if incident.assigned_units:
-            amb = db.query(AmbulanceDB).filter(AmbulanceDB.id.in_(incident.assigned_units)).first()
-            if amb:
-                amb.status = Status.AVAILABLE
+        assigned_units = list(incident.assigned_units or [])
         
         incident.status = Status.QUEUED
         incident.assigned_hospital = None
         incident.assigned_units = []
-        count += 1
+        db.commit()
 
-    # 2. Fix any "Zombie" ambulances
+        for amb_id in assigned_units:
+            await cancel_and_return_to_base(amb_id, db)
+        
+        count += 1
 
     busy_ambulances = db.query(AmbulanceDB).filter(AmbulanceDB.status == Status.BUSY).all()
     
@@ -1199,8 +1304,7 @@ def cleanup_stale_missions(db: Session):
 
         if not active_assignment:
             logger.warning(f"Found Zombie Ambulance {amb.id} (BUSY but no incident). Resetting to AVAILABLE.")
-            amb.status = Status.AVAILABLE
-
+            await cancel_and_return_to_base(amb.id, db)
 
     db.commit()
     if count > 0:
@@ -1210,7 +1314,7 @@ def cleanup_stale_missions(db: Session):
 
 @app.post("/cleanup_stale")
 async def manual_cleanup(db: Session = Depends(get_db)):
-    cleanup_stale_missions(db)
+    await cleanup_stale_missions(db)
     return {"msg": "System reset successful. Zombies cleared."}
 
 @app.get("/logs")

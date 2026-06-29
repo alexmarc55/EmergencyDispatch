@@ -178,14 +178,6 @@ export default function PatientsPage() {
         <Sidebar isOpen={sidebarOpen} />
         <div className={`patients-page ${sidebarOpen ? 'sidebar-open' : ''}`}>
           
-          <div className="new-patient-button-container">
-            {(userRole === 'admin' || userRole === 'operator') && (
-              <button className="new-patient-button" onClick={() => openAddModal()}>
-                New Patient
-              </button>
-            )}
-          </div>
-
           <div className="header">
             <h1>Patients</h1>
             <SearchBar
@@ -194,6 +186,11 @@ export default function PatientsPage() {
               placeholder="Search patients..."
               searchKeys={["id", "name", "phone_number"]}
             />
+            {(userRole === 'admin' || userRole === 'operator') && (
+              <button className="new-patient-button" onClick={() => openAddModal()}>
+                New Patient
+              </button>
+            )}
           </div>
 
           <div className="patients-list">

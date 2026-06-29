@@ -175,14 +175,6 @@ export default function EmergencyCentersPage() {
         <Sidebar isOpen={sidebarOpen} />
         <div className={`emergency-centers-page ${sidebarOpen ? 'sidebar-open' : ''}`}>
           
-          <div className="new-center-button-container">
-            {(userRole === 'admin' || userRole === 'operator') && (
-              <button className="new-center-button" onClick={() => openAddModal()}>
-                New Center
-              </button>
-            )}
-          </div>
-
           <div className="header">
             <h1>Emergency Centers</h1>
             <SearchBar
@@ -191,6 +183,11 @@ export default function EmergencyCentersPage() {
               placeholder="Search centers..."
               searchKeys={["id", "name"]}
             />
+            {(userRole === 'admin' || userRole === 'operator') && (
+              <button className="new-center-button" onClick={() => openAddModal()}>
+                New Center
+              </button>
+            )}
           </div>
 
           <div className="emergency-centers-list">

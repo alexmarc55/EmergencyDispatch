@@ -36,7 +36,6 @@ const hospitalIcon = new L.Icon({
   popupAnchor: [0, -15],
 });
 
-// Defined outside component — pure function, no hooks needed
 function getProgressiveRoute(fullRoute, currentLat, currentLon) {
   if (!fullRoute || fullRoute.length === 0) return [];
 
@@ -70,6 +69,7 @@ function CameraFollower({ lat, lon, heading }) {
   const currentBearing = useRef(0);
   const animFrameRef = useRef(null);
 
+  // Handle user dragging to temporarily disable camera following
   useEffect(() => {
     const startDragging = () => {
       setIsUserDragging(true);
@@ -102,20 +102,24 @@ function CameraFollower({ lat, lon, heading }) {
     });
 
     if (map.setBearing) {
+      // Calculate the shortest rotation direction
       const target = -heading;
-      const diff = ((target - currentBearing.current + 540) % 360) - 180;
-      const targetBearing = ((currentBearing.current + diff + 180) % 360) - 180;
+      const startBearing = map.getBearing() || 0;
+      const diff = ((((target - startBearing) % 360) + 540) % 360) - 180;
+      const targetBearing = startBearing + diff;
 
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
 
-      const startBearing = currentBearing.current;
       const startTime = performance.now();
       const DURATION = 800;
 
       function animateBearing(now) {
         const t = Math.min((now - startTime) / DURATION, 1);
         const eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-        map.setBearing(startBearing + (targetBearing - startBearing) * eased);
+        const currentVal =
+          startBearing + (targetBearing - startBearing) * eased;
+        map.setBearing(currentVal);
+        currentBearing.current = currentVal;
         if (t < 1) {
           animFrameRef.current = requestAnimationFrame(animateBearing);
         } else {
@@ -140,12 +144,29 @@ export default function DriverMap({
   ambulance,
   hospital,
 }) {
-  // 1. Add state to latch the arrival
-  const [hasArrived, setHasArrived] = useState(false);
+  const lastHeading = useRef(0);
+  const arrivalKey =
+    incident?.id && ambulance?.id
+      ? `arrived-${incident.id}-${ambulance.id}`
+      : null;
 
-  // 2. Latch logic: Once true, it stays true for this incident
+  const [hasArrived, setHasArrived] = useState(() => {
+    if (arrivalKey) {
+      return localStorage.getItem(arrivalKey) === "true";
+    }
+    return false;
+  });
+
   useEffect(() => {
-    if (hasArrived || !ambulance || !incident) return;
+    if (arrivalKey) {
+      setHasArrived(localStorage.getItem(arrivalKey) === "true");
+    } else {
+      setHasArrived(false);
+    }
+  }, [arrivalKey]);
+
+  useEffect(() => {
+    if (hasArrived || !ambulance || !incident || !arrivalKey) return;
 
     const ambKey = String(ambulance.id);
     const routeInc = incident.route_to_incident?.[ambKey];
@@ -154,17 +175,31 @@ export default function DriverMap({
       const [lastLon, lastLat] = routeInc[routeInc.length - 1];
       const dist = Math.hypot(ambulance.lat - lastLat, ambulance.lon - lastLon);
 
-      // If within ~20-30 meters of the incident destination
       if (dist < 0.0003) {
         setHasArrived(true);
+        localStorage.setItem(arrivalKey, "true");
       }
     }
-  }, [ambulance?.lat, ambulance?.lon, incident?.id, hasArrived]);
+  }, [ambulance?.lat, ambulance?.lon, incident?.id, hasArrived, arrivalKey]);
 
-  // Reset arrival state if the incident changes or is resolved
   useEffect(() => {
-    setHasArrived(false);
-  }, [incident?.id]);
+    if (!ambulance?.id || !incident) return;
+    if (incident.status === "Resolved" || ambulance.status === "Available") {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (
+          key &&
+          key.startsWith("arrived-") &&
+          key.endsWith(`-${ambulance.id}`)
+        ) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((key) => localStorage.removeItem(key));
+      setHasArrived(false);
+    }
+  }, [incident, ambulance?.status, ambulance?.id]);
 
   const activeRoute = useMemo(() => {
     const lines = [];
@@ -221,38 +256,49 @@ export default function DriverMap({
 
   const heading = useMemo(() => {
     const currentLine = activeRoute[0];
-    if (!currentLine || currentLine.positions.length < 2) return 0;
+    if (!currentLine || currentLine.positions.length < 2) {
+      return lastHeading.current;
+    }
 
+    // We look ahead 4 points because the backend sends every 3 points
     const positions = currentLine.positions;
-    const LOOKAHEAD = Math.min(5, positions.length - 1);
-
-    const fromLat = ambulance?.lat ?? positions[0][0];
-    const fromLon = ambulance?.lon ?? positions[0][1];
+    const LOOKAHEAD = Math.min(4, positions.length - 1);
 
     let sinSum = 0;
     let cosSum = 0;
+    let count = 0;
 
-    for (let i = 1; i <= LOOKAHEAD; i++) {
-      const toLat = positions[i][0];
-      const toLon = positions[i][1];
+    for (let i = 0; i < LOOKAHEAD; i++) {
+      // We calculate the angle between the current point and the next point in the route
+      const lat1 = positions[i][0];
+      const lon1 = positions[i][1];
+      const lat2 = positions[i + 1][0];
+      const lon2 = positions[i + 1][1];
 
-      const dLon = ((toLon - fromLon) * Math.PI) / 180;
-      const lat1 = (fromLat * Math.PI) / 180;
-      const lat2 = (toLat * Math.PI) / 180;
+      const dLon = ((lon2 - lon1) * Math.PI) / 180;
+      const rLat1 = (lat1 * Math.PI) / 180;
+      const rLat2 = (lat2 * Math.PI) / 180;
 
-      const y = Math.sin(dLon) * Math.cos(lat2);
+      const y = Math.sin(dLon) * Math.cos(rLat2);
       const x =
-        Math.cos(lat1) * Math.sin(lat2) -
-        Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+        Math.cos(rLat1) * Math.sin(rLat2) -
+        Math.sin(rLat1) * Math.cos(rLat2) * Math.cos(dLon);
 
       const bearing = Math.atan2(y, x);
-      sinSum += Math.sin(bearing);
-      cosSum += Math.cos(bearing);
+      const weight = 1 / (i + 1);
+
+      sinSum += Math.sin(bearing) * weight;
+      cosSum += Math.cos(bearing) * weight;
+      count += weight;
     }
 
-    const avgBearing = Math.atan2(sinSum / LOOKAHEAD, cosSum / LOOKAHEAD);
-    return ((avgBearing * 180) / Math.PI + 360) % 360;
-  }, [activeRoute, ambulance]);
+    if (count === 0) return lastHeading.current;
+
+    const avgBearing = Math.atan2(sinSum / count, cosSum / count);
+    const newHeading = ((avgBearing * 180) / Math.PI + 360) % 360;
+    lastHeading.current = newHeading;
+    return newHeading;
+  }, [activeRoute]);
 
   if (!ambulance?.id) {
     return (
@@ -274,6 +320,7 @@ export default function DriverMap({
       rotate={true}
       bearing={-heading}
       touchRotate={true}
+      rotateControl={false}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

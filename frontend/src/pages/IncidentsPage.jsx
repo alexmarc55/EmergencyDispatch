@@ -5,15 +5,19 @@ import Sidebar from "../components/Sidebar";
 import SearchBar from "../components/Searchbar";
 import Modal from "../components/Modal";
 import NewIncidentModal from "../components/NewIncidentModal";
+import PatientSelectionModal from "../components/PatientSelectionModal";
 import "./IncidentsPage.css";
+import "../components/NewIncidentModal.css";
 import {
   create_incident,
   get_incidents,
   update_incident,
   delete_incident,
   convert_address,
+  get_patients,
+  create_patient,
 } from "../services/api";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaUserPlus, FaUserCheck } from "react-icons/fa";
 
 export default function IncidentsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -23,6 +27,9 @@ export default function IncidentsPage() {
   const [formData, setFormData] = useState({});
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [newIncidentModalOpen, setNewIncidentModalOpen] = useState(false);
+  const [editPatients, setEditPatients] = useState([]);
+  const [patientSelectionOpen, setPatientSelectionOpen] = useState(false);
+  const [currentPatientSlot, setCurrentPatientSlot] = useState(null);
   const navigate = useNavigate();
 
   const rawRole = localStorage.getItem("user_role");
@@ -48,6 +55,31 @@ export default function IncidentsPage() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (activeModal !== "edit") return;
+    const newCount = formData.nr_patients || 1;
+    setEditPatients((prev) => {
+      if (newCount > prev.length)
+        return [...prev, ...Array(newCount - prev.length).fill(null)];
+      return prev.slice(0, newCount);
+    });
+  }, [formData.nr_patients]);
+
+  const handleOpenEditPatientSlot = (index) => {
+    setCurrentPatientSlot(index);
+    setPatientSelectionOpen(true);
+  };
+
+  const handleEditPatientSelected = (patient) => {
+    setEditPatients((prev) => {
+      const next = [...prev];
+      next[currentPatientSlot] = patient;
+      return next;
+    });
+    setPatientSelectionOpen(false);
+    setCurrentPatientSlot(null);
+  };
+
   const fetchData = async () => {
     try {
       const incidentsData = await get_incidents();
@@ -62,10 +94,24 @@ export default function IncidentsPage() {
     setFilteredIncidents(filtered);
   };
 
-  const openEditModal = (incident) => {
+  const openEditModal = async (incident) => {
     setSelectedIncident(incident);
     setFormData({ ...incident });
     setActiveModal("edit");
+
+    try {
+      const allPatients = await get_patients();
+      const slots = Array(incident.nr_patients || 1)
+        .fill(null)
+        .map((_, i) => {
+          const id = incident.patient_ids?.[i];
+          return id ? (allPatients.find((p) => p.id === id) ?? null) : null;
+        });
+      setEditPatients(slots);
+    } catch (err) {
+      console.error("Failed to load patients for edit:", err);
+      setEditPatients(Array(incident.nr_patients || 1).fill(null));
+    }
   };
 
   const openDeleteModal = (incident) => {
@@ -109,6 +155,7 @@ export default function IncidentsPage() {
         type: formData.type,
         nr_patients: formData.nr_patients,
         needs_UPU: formData.needs_UPU || true,
+        patient_ids: editPatients.filter((p) => p?.id).map((p) => p.id),
       };
       const updated = await update_incident(payload);
 
@@ -179,16 +226,6 @@ export default function IncidentsPage() {
       <div className="main-content">
         <Sidebar isOpen={sidebarOpen} />
         <div className={`incidents-page ${sidebarOpen ? "sidebar-open" : ""}`}>
-          <div className="new-incident-button-container">
-            {(userRole === "admin" || userRole === "operator") && (
-              <button
-                className="new-incident-button"
-                onClick={() => setNewIncidentModalOpen(true)}
-              >
-                New Incident
-              </button>
-            )}
-          </div>
           <div className="header">
             <h1>Incidents</h1>
             <SearchBar
@@ -197,6 +234,14 @@ export default function IncidentsPage() {
               placeholder="Search incidents..."
               searchKeys={["id", "status", "severity", "type"]}
             />
+            {(userRole === "admin" || userRole === "operator") && (
+              <button
+                className="new-incident-button"
+                onClick={() => setNewIncidentModalOpen(true)}
+              >
+                New Incident
+              </button>
+            )}
           </div>
           <div className="incidents-list">
             {filteredIncidents.map((incident) => (
@@ -218,6 +263,12 @@ export default function IncidentsPage() {
                 <p>Severity: {incident.severity}</p>
                 <p>
                   Location: ({incident.lat}, {incident.lon})
+                </p>
+                <p>
+                  Assigned Unit(s):{" "}
+                  {incident.assigned_units && incident.assigned_units.length > 0
+                    ? incident.assigned_units.join(", ")
+                    : "None"}
                 </p>
                 <p>Started at: {incident.started_at}</p>
                 <p>Ended at: {incident.ended_at}</p>
@@ -322,6 +373,39 @@ export default function IncidentsPage() {
               <option value={false}>No</option>
             </select>
           </div>
+
+          {formData.nr_patients > 0 && (
+            <div className="form-group">
+              <label>Patients</label>
+              <div className="patient-slots-container">
+                {editPatients.map((patient, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className="patient-slot-button"
+                    onClick={() => handleOpenEditPatientSlot(index)}
+                    title={patient ? patient.name : "Click to assign a patient"}
+                  >
+                    {patient ? (
+                      <>
+                        <FaUserCheck
+                          style={{ color: "#28a745", marginRight: 6 }}
+                        />
+                        {patient.name} (Age: {patient.age})
+                      </>
+                    ) : (
+                      <>
+                        <FaUserPlus
+                          style={{ color: "#007bff", marginRight: 6 }}
+                        />
+                        Patient {index + 1} — Click to assign
+                      </>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </form>
       </Modal>
 
@@ -334,6 +418,18 @@ export default function IncidentsPage() {
           fetchData();
           setNewIncidentModalOpen(false);
         }}
+      />
+
+      <PatientSelectionModal
+        isOpen={patientSelectionOpen}
+        onClose={() => {
+          setPatientSelectionOpen(false);
+          setCurrentPatientSlot(null);
+        }}
+        onSelectPatient={handleEditPatientSelected}
+        currentPatient={
+          currentPatientSlot !== null ? editPatients[currentPatientSlot] : null
+        }
       />
     </div>
   );

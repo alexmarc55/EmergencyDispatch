@@ -45,6 +45,12 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  color: #000000;
+}
+
+.stats-header h2,
+.stats-header p {
+  color: #000000 !important;
 }
 
 .chart-controls-wrapper {
@@ -105,11 +111,12 @@
   margin-bottom: 15px;
   border-bottom: 1px solid #dee2e6;
   padding-bottom: 10px;
+  color: #000000;
 }
 
 .section-header h3 {
   font-size: 1.1rem;
-  color: #f3f3f3;
+  color: #000000;
   margin: 0;
 }
 

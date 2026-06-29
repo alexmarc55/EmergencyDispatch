@@ -1,85 +1,90 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
-import Sidebar from '../components/Sidebar'
-import SearchBar from '../components/Searchbar'
-import Modal from '../components/Modal'
-import './UsersPage.css'
-import { get_users, create_user, update_user, delete_user } from '../services/api'
-import { FaEdit, FaTrash } from 'react-icons/fa'
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
+import SearchBar from "../components/Searchbar";
+import Modal from "../components/Modal";
+import "./UsersPage.css";
+import {
+  get_users,
+  create_user,
+  update_user,
+  delete_user,
+} from "../services/api";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 export default function UsersPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [users, setUsers] = useState([])
-  const [filteredUsers, setFilteredUsers] = useState([])
-  const [activeModal, setActiveModal] = useState(null)
-  const [formData, setFormData] = useState({})
-  const [selectedUser, setSelectedUser] = useState(null)
-  const navigate = useNavigate()
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [activeModal, setActiveModal] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [selectedUser, setSelectedUser] = useState(null);
+  const navigate = useNavigate();
 
-  const rawRole = localStorage.getItem('user_role')
-  const userRole = rawRole?.toLowerCase() || ''
+  const rawRole = localStorage.getItem("user_role");
+  const userRole = rawRole?.toLowerCase() || "";
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen)
-  }
+    setSidebarOpen(!sidebarOpen);
+  };
 
   useEffect(() => {
-    if (userRole !== 'admin') {
-        navigate('/') 
-        return
+    if (userRole !== "admin") {
+      navigate("/");
+      return;
     }
 
-    get_users().then(data => {
-      setUsers(data)
-      setFilteredUsers(data)
-    })
-  }, [])
+    get_users().then((data) => {
+      setUsers(data);
+      setFilteredUsers(data);
+    });
+  }, []);
 
   useEffect(() => {
-    if (userRole !== 'admin') return
+    if (userRole !== "admin") return;
 
-    fetchData()
-    const interval = setInterval(fetchData, 1000) 
-    return () => clearInterval(interval)
-  }, [])
-  
+    fetchData();
+    const interval = setInterval(fetchData, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const fetchData = async () => {
     try {
-        const data = await get_users()
-        setUsers(data)
-        setFilteredUsers(data) 
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-  }
+      const data = await get_users();
+      setUsers(data);
+      setFilteredUsers(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   const handleSearch = (filtered, query) => {
-    setFilteredUsers(filtered)
-  }
+    setFilteredUsers(filtered);
+  };
 
   // --- MODAL HANDLERS ---
 
   const openEditModal = (user) => {
     setSelectedUser(user);
-    setFormData({ 
-        id: user.id,
-        username: user.username,
-        role: user.role,
-        badge_number: user.badge_number,
-        password: "" 
+    setFormData({
+      id: user.id,
+      username: user.username,
+      role: user.role,
+      badge_number: user.badge_number,
+      password: "",
     });
-    setActiveModal('edit');
+    setActiveModal("edit");
   };
 
   const openDeleteModal = (user) => {
     setSelectedUser(user);
-    setActiveModal('delete');
+    setActiveModal("delete");
   };
 
   const openAddModal = () => {
     setFormData({});
-    setActiveModal('add');
+    setActiveModal("add");
   };
 
   const closeModal = () => {
@@ -92,7 +97,7 @@ export default function UsersPage() {
     try {
       await delete_user(selectedUser.id);
 
-      const updated = users.filter(u => u.id !== selectedUser.id);
+      const updated = users.filter((u) => u.id !== selectedUser.id);
       setUsers(updated);
       setFilteredUsers(updated);
 
@@ -106,8 +111,10 @@ export default function UsersPage() {
     e.preventDefault();
     try {
       if (!formData.password) {
-          alert("Please enter a new password (or re-enter old one) to update user.");
-          return;
+        alert(
+          "Please enter a new password (or re-enter old one) to update user.",
+        );
+        return;
       }
 
       const payload = {
@@ -115,12 +122,12 @@ export default function UsersPage() {
         username: formData.username,
         password: formData.password,
         role: formData.role,
-        badge_number: formData.badge_number
-      }
-      
+        badge_number: formData.badge_number,
+      };
+
       const updated = await update_user(payload);
 
-      const newUsers = users.map(u => u.id === updated.id ? updated : u);
+      const newUsers = users.map((u) => (u.id === updated.id ? updated : u));
       setUsers(newUsers);
       setFilteredUsers(newUsers);
 
@@ -143,7 +150,7 @@ export default function UsersPage() {
         username: formData.username,
         password: formData.password,
         role: formData.role || "operator",
-        badge_number: formData.badge_number
+        badge_number: formData.badge_number,
       };
 
       const created = await create_user(newUser);
@@ -156,11 +163,11 @@ export default function UsersPage() {
       console.error(error);
       alert("Failed to create user: " + error.message);
     }
-  }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -168,16 +175,7 @@ export default function UsersPage() {
       <Navbar onToggleSidebar={toggleSidebar} />
       <div className="main-content">
         <Sidebar isOpen={sidebarOpen} />
-        <div className={`users-page ${sidebarOpen ? 'sidebar-open' : ''}`}>
-          
-          <div className="new-user-button-container">
-            {userRole === 'admin' && (
-              <button className="new-user-button" onClick={() => openAddModal()}>
-                New User
-              </button>
-            )}
-          </div>
-
+        <div className={`users-page ${sidebarOpen ? "sidebar-open" : ""}`}>
           <div className="header">
             <h1>Users</h1>
             <SearchBar
@@ -186,23 +184,40 @@ export default function UsersPage() {
               placeholder="Search users..."
               searchKeys={["id", "username", "badge_number", "role"]}
             />
+            {userRole === "admin" && (
+              <button
+                className="new-user-button"
+                onClick={() => openAddModal()}
+              >
+                New User
+              </button>
+            )}
           </div>
 
           <div className="users-list">
             {filteredUsers.map((user) => (
               <div key={user.id} className="users-card">
-                
-                {userRole === 'admin' && (
+                {userRole === "admin" && (
                   <div className="CRUD-buttons">
-                    <button onClick={() => openEditModal(user)}><FaEdit /></button>
-                    <button onClick={() => openDeleteModal(user)}><FaTrash /></button>
+                    <button onClick={() => openEditModal(user)}>
+                      <FaEdit />
+                    </button>
+                    <button onClick={() => openDeleteModal(user)}>
+                      <FaTrash />
+                    </button>
                   </div>
                 )}
 
                 <h2>{user.username}</h2>
-                <p><strong>Role:</strong> {user.role}</p>
-                <p><strong>Badge #:</strong> {user.badge_number}</p>
-                <p style={{fontSize: '0.8rem', color: '#666'}}>ID: {user.id}</p>
+                <p>
+                  <strong>Role:</strong> {user.role}
+                </p>
+                <p>
+                  <strong>Badge #:</strong> {user.badge_number}
+                </p>
+                <p style={{ fontSize: "0.8rem", color: "#666" }}>
+                  ID: {user.id}
+                </p>
               </div>
             ))}
           </div>
@@ -210,132 +225,157 @@ export default function UsersPage() {
       </div>
 
       {/* --- DELETE MODAL --- */}
-      <Modal 
-        isOpen={activeModal === 'delete'} 
-        onClose={closeModal} 
+      <Modal
+        isOpen={activeModal === "delete"}
+        onClose={closeModal}
         title="Confirm Delete"
         actions={
           <>
-            <button className="btn-secondary" onClick={closeModal}>Cancel</button>
-            <button className="btn-danger" onClick={handleDeleteConfirm}>Delete</button>
+            <button className="btn-secondary" onClick={closeModal}>
+              Cancel
+            </button>
+            <button className="btn-danger" onClick={handleDeleteConfirm}>
+              Delete
+            </button>
           </>
         }
       >
-        <p>Are you sure you want to delete user <strong>{selectedUser?.username}</strong>?</p>
-        <p style={{color: 'red', fontSize: '0.9rem'}}>This action cannot be undone.</p>
+        <p>
+          Are you sure you want to delete user{" "}
+          <strong>{selectedUser?.username}</strong>?
+        </p>
+        <p style={{ color: "red", fontSize: "0.9rem" }}>
+          This action cannot be undone.
+        </p>
       </Modal>
 
       {/* --- EDIT MODAL --- */}
-      <Modal 
-        isOpen={activeModal === 'edit'} 
-        onClose={closeModal} 
+      <Modal
+        isOpen={activeModal === "edit"}
+        onClose={closeModal}
         title={`Edit User: ${selectedUser?.username}`}
         actions={
           <>
-            <button className="btn-secondary" onClick={closeModal}>Cancel</button>
-            <button className="btn-primary" onClick={handleEditSubmit}>Save Changes</button>
+            <button className="btn-secondary" onClick={closeModal}>
+              Cancel
+            </button>
+            <button className="btn-primary" onClick={handleEditSubmit}>
+              Save Changes
+            </button>
           </>
         }
       >
         <form id="edit-form">
           <div className="form-group">
             <label>Username</label>
-            <input 
-              type="text" 
-              name="username" 
-              value={formData.username || ''} 
-              onChange={handleInputChange} 
+            <input
+              type="text"
+              name="username"
+              value={formData.username || ""}
+              onChange={handleInputChange}
             />
           </div>
 
           <div className="form-group">
             <label>New Password</label>
-            <input 
-              type="text" 
-              name="password" 
-              placeholder="Enter new password"
-              value={formData.password || ''} 
-              onChange={handleInputChange} 
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter new or old password"
+              value={formData.password || ""}
+              onChange={handleInputChange}
             />
           </div>
 
           <div className="form-group">
             <label>Role</label>
-            <select name="role" value={formData.role || 'operator'} onChange={handleInputChange}>
-                <option value="operator">Operator</option>
-                <option value="admin">Admin</option>
-                <option value="driver">Driver</option>
+            <select
+              name="role"
+              value={formData.role || "operator"}
+              onChange={handleInputChange}
+            >
+              <option value="operator">Operator</option>
+              <option value="admin">Admin</option>
+              <option value="driver">Driver</option>
             </select>
           </div>
 
           <div className="form-group">
             <label>Badge Number</label>
-            <input 
-              type="text" 
-              name="badge_number" 
-              value={formData.badge_number || ''} 
-              onChange={handleInputChange} 
+            <input
+              type="text"
+              name="badge_number"
+              value={formData.badge_number || ""}
+              onChange={handleInputChange}
             />
           </div>
         </form>
       </Modal>
 
       {/* --- ADD MODAL --- */}
-      <Modal 
-        isOpen={activeModal === 'add'} 
-        onClose={closeModal} 
+      <Modal
+        isOpen={activeModal === "add"}
+        onClose={closeModal}
         title="Create New User"
         actions={
           <>
-            <button className="btn-secondary" onClick={closeModal}>Cancel</button>
-            <button className="btn-primary" onClick={handleAddSubmit}>Create User</button>
+            <button className="btn-secondary" onClick={closeModal}>
+              Cancel
+            </button>
+            <button className="btn-primary" onClick={handleAddSubmit}>
+              Create User
+            </button>
           </>
         }
       >
         <form>
           <div className="form-group">
             <label>Username</label>
-            <input 
-              type="text" 
-              name="username" 
+            <input
+              type="text"
+              name="username"
               placeholder="Username"
-              value={formData.username || ''} 
-              onChange={handleInputChange} 
+              value={formData.username || ""}
+              onChange={handleInputChange}
             />
           </div>
 
           <div className="form-group">
             <label>Password</label>
-            <input 
-              type="password" 
-              name="password" 
+            <input
+              type="password"
+              name="password"
               placeholder="Password"
-              value={formData.password || ''} 
-              onChange={handleInputChange} 
+              value={formData.password || ""}
+              onChange={handleInputChange}
             />
           </div>
 
           <div className="form-group">
             <label>Role</label>
-            <select name="role" value={formData.role || 'operator'} onChange={handleInputChange}>
-                <option value="operator">Operator</option>
-                <option value="admin">Admin</option>
-                <option value="driver">Driver</option>
+            <select
+              name="role"
+              value={formData.role || "operator"}
+              onChange={handleInputChange}
+            >
+              <option value="operator">Operator</option>
+              <option value="admin">Admin</option>
+              <option value="driver">Driver</option>
             </select>
           </div>
 
           <div className="form-group">
             <label>Badge Number</label>
-            <input 
-              type="text" 
-              name="badge_number" 
+            <input
+              type="text"
+              name="badge_number"
               placeholder="e.g. OP-1234"
-              value={formData.badge_number || ''} 
-              onChange={handleInputChange} 
+              value={formData.badge_number || ""}
+              onChange={handleInputChange}
             />
           </div>
         </form>
       </Modal>
     </div>
-  )
+  );
 }

@@ -238,17 +238,6 @@ export default function AmbulancesPage() {
       <div className="main-content">
         <Sidebar isOpen={sidebarOpen} />
         <div className={`ambulances-page ${sidebarOpen ? "sidebar-open" : ""}`}>
-          <div className="new-incident-button-container">
-            {(userRole === "admin" || userRole === "operator") && (
-              <button
-                className="new-incident-button"
-                onClick={() => openAddModal()}
-              >
-                New Ambulance
-              </button>
-            )}
-          </div>
-
           <div className="header">
             <h1>Ambulances</h1>
             <SearchBar
@@ -257,6 +246,14 @@ export default function AmbulancesPage() {
               placeholder="Search ambulances..."
               searchKeys={["id", "status"]}
             />
+            {(userRole === "admin" || userRole === "operator") && (
+              <button
+                className="new-ambulance-button"
+                onClick={() => openAddModal()}
+              >
+                New Ambulance
+              </button>
+            )}
           </div>
 
           <div className="ambulances-list">

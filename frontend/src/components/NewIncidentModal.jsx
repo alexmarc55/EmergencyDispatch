@@ -156,7 +156,7 @@ export default function NewIncidentModal({ isOpen, onClose, onSuccess }) {
             <input
               type="text"
               name="address"
-              placeholder="e.g. Piata Libertatii 1"
+              placeholder="e.g. Bulevardul Traian 2"
               value={formData.address}
               onChange={handleInputChange}
             />

@@ -22,7 +22,6 @@
   height: 100%;
   box-sizing: border-box;
   overflow-y: auto;
-  padding-top: 60px;
 }
 
 .patients-page h1 {
@@ -40,13 +39,13 @@
 
 .patients-list {
   width: 100%;
-  flex-basis: calc(50% - 12px);
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 20px;
   align-items: flex-start;
+  flex-shrink: 0;
 }
 
 .patients-card {
@@ -74,17 +73,6 @@
   margin: 0;
 }
 
-.new-patient-button-container {
-  position: absolute;
-  right: 40px;
-  top: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-bottom: 10px;
-  background-color: white;
-}
-
 .new-patient-button {
   background-color: #fcfcfc;
   color: rgb(236, 41, 41);
@@ -94,4 +82,5 @@
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-left: auto;
 }

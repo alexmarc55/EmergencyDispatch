@@ -178,14 +178,6 @@ export default function HospitalsPage() {
         <Sidebar isOpen={sidebarOpen} />
         <div className={`hospitals-page ${sidebarOpen ? 'sidebar-open' : ''}`}>
           
-          <div className="new-hospital-button-container">
-            {(userRole === 'admin' || userRole === 'operator') && (
-              <button className="new-hospital-button" onClick={() => openAddModal()}>
-                New Hospital
-              </button>
-            )}
-          </div>
-
           <div className="header">
             <h1>Hospitals</h1>
             <SearchBar
@@ -194,6 +186,11 @@ export default function HospitalsPage() {
               placeholder="Search hospitals..."
               searchKeys={["id", "name", "type"]}
             />
+            {(userRole === 'admin' || userRole === 'operator') && (
+              <button className="new-hospital-button" onClick={() => openAddModal()}>
+                New Hospital
+              </button>
+            )}
           </div>
 
           <div className="hospitals-list">
